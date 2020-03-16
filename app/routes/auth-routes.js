@@ -1,45 +1,78 @@
-const express = require('express')
-const router = express.Router()
-const { check, cookie } = require('express-validator')
+const express = require("express");
 
-const { isAuth } = require('../middlewares/auth-middleware')
-const authController = require('../controllers/auth-controller')
-const { cookieNames } = require('../utils/cookie-utils')
+const router = express.Router();
+const { check, cookie } = require("express-validator");
 
-router.get('/check-auth', isAuth, authController.checkAuth)
-router.post('/check-role', isAuth,
+const { isAuth } = require("../middlewares/auth-middleware");
+const authController = require("../controllers/auth-controller");
+const { cookieNames } = require("../utils/cookie-utils");
+
+router.get("/check-auth", isAuth, authController.checkAuth);
+router.post(
+  "/check-role",
+  isAuth,
   [
-    check('roles').not().isEmpty().withMessage('is required')
+    check("roles")
+      .not()
+      .isEmpty()
+      .withMessage("is required")
   ],
-  authController.checkRole)
+  authController.checkRole
+);
 
-router.post('/login',
+router.post(
+  "/login",
   [
-    check('username').not().isEmpty().withMessage('is required'),
-    check('password').not().isEmpty().withMessage('is required'),
+    check("username")
+      .not()
+      .isEmpty()
+      .withMessage("is required"),
+    check("password")
+      .not()
+      .isEmpty()
+      .withMessage("is required"),
     // check('remember').not().isEmpty().withMessage('is required'),
-    cookie(cookieNames.refreshToken).isEmpty().withMessage('Already logged in')
+    cookie(cookieNames.refreshToken)
+      .isEmpty()
+      .withMessage("Already logged in")
   ],
-  authController.performLogin)
+  authController.performLogin
+);
 
-router.post('/signup',
+router.post(
+  "/signup",
   [
-    check('username').not().isEmpty().withMessage('is required'),
-    check('password').not().isEmpty().withMessage('is required'),
-    check('email').isEmail().normalizeEmail().withMessage('has invalid format')
+    check("username")
+      .not()
+      .isEmpty()
+      .withMessage("is required"),
+    check("password")
+      .not()
+      .isEmpty()
+      .withMessage("is required"),
+    check("email")
+      .isEmail()
+      .normalizeEmail()
+      .withMessage("has invalid format")
     // check('lastname').not().isEmpty().withMessage('is required'),
     // check('firstname').not().isEmpty().withMessage('is required'),
   ],
-  authController.performSignUp)
+  authController.performSignUp
+);
 
-router.post('/signout', isAuth, authController.performSignOut)
+router.post("/signout", isAuth, authController.performSignOut);
 
-router.post('/signout-allsessions', isAuth, authController.performSignOutAllSessions)
+router.post("/signout-allsessions", isAuth, authController.performSignOutAllSessions);
 
-router.post('/refresh-token',
+router.post(
+  "/refresh-token",
   [
-    cookie(cookieNames.refreshToken).not().isEmpty().withMessage('Must be logged in')
-  ]
-  , authController.performRefreshToken)
+    cookie(cookieNames.refreshToken)
+      .not()
+      .isEmpty()
+      .withMessage("Must be logged in")
+  ],
+  authController.performRefreshToken
+);
 
-module.exports = router
+module.exports = router;
