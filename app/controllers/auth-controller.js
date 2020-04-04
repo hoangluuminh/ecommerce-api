@@ -58,32 +58,6 @@ exports.performLogin = async (req, res, next) => {
   }
 };
 
-exports.performSignUp = async (req, res, next) => {
-  const actionName = "performSignUp";
-  // Validations
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    getUserReqMsg(`${controllerName}.${actionName}`, errors);
-    return res.status(422).json(errors);
-  }
-  // Declarations
-  const { username, password, email, lastname, firstname } = req.body;
-  // Executions
-  try {
-    const userAccount = await authService.performSignUp(
-      username,
-      password,
-      email,
-      lastname,
-      firstname
-    );
-    return res.json({ userAccount });
-  } catch (error) {
-    getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Signup unsuccessful", 500));
-  }
-};
-
 exports.performSignOut = async (req, res, next) => {
   const actionName = "performSignOut";
   // Declarations

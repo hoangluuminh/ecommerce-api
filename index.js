@@ -10,6 +10,7 @@ const LoggingUtil = require("./app/utils/logging-utils");
 const itemRoutes = require("./app/routes/item-routes");
 const brandRoutes = require("./app/routes/brand-routes");
 const categoryRoutes = require("./app/routes/category-routes");
+const userRoutes = require("./app/routes/user-routes");
 const authRoutes = require("./app/routes/auth-routes");
 
 const app = express();
@@ -26,6 +27,7 @@ app.use(
 app.use("/api/items", itemRoutes);
 app.use("/api/brands", brandRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 
 // Undefined route Handler
