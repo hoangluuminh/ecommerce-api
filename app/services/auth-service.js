@@ -9,9 +9,6 @@ const LogError = require("../models/log-error");
 const UserAccount = db.userAccount;
 // const UserRole = db.userRole
 
-// BCrypt Password Salt
-const saltRounds = 10;
-
 exports.performLogin = async (username, password, remember) => {
   // Get user account
   const userAccount = await UserAccount.findOne({
@@ -61,30 +58,6 @@ exports.performLogin = async (username, password, remember) => {
       createdAt: userAccount.createdAt,
       updatedAt: userAccount.updatedAt
     }
-  };
-};
-
-exports.performSignUp = async (username, password, email, lastname, firstname) => {
-  const id = new Date().getTime();
-  // Hash password
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
-  const userAccount = await UserAccount.create({
-    id,
-    username,
-    password: hashedPassword,
-    email,
-    lastname,
-    firstname,
-    role: "manager"
-  });
-  return {
-    id: userAccount.dataValues.id,
-    username: userAccount.dataValues.username,
-    email: userAccount.dataValues.email,
-    lastname: userAccount.dataValues.lastname,
-    firstname: userAccount.dataValues.firstname,
-    createdAt: userAccount.dataValues.createdAt,
-    updatedAt: userAccount.dataValues.updatedAt
   };
 };
 

@@ -39,27 +39,6 @@ router.post(
   authController.performLogin
 );
 
-router.post(
-  "/signup",
-  [
-    check("username")
-      .not()
-      .isEmpty()
-      .withMessage("is required"),
-    check("password")
-      .not()
-      .isEmpty()
-      .withMessage("is required"),
-    check("email")
-      .isEmail()
-      .normalizeEmail()
-      .withMessage("has invalid format")
-    // check('lastname').not().isEmpty().withMessage('is required'),
-    // check('firstname').not().isEmpty().withMessage('is required'),
-  ],
-  authController.performSignUp
-);
-
 router.post("/signout", isAuth, authController.performSignOut);
 
 router.post("/signout-allsessions", isAuth, authController.performSignOutAllSessions);
