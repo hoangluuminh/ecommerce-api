@@ -1,9 +1,10 @@
 const bcrypt = require("bcrypt");
 const db = require("../models");
 
-const { Op, fn, col } = db.Sequelize;
+const { Op } = db.Sequelize;
 const { userAccount: UserAccount, userRole: UserRole } = db;
-const LogError = require("../models/log-error");
+const HttpError = require("../models/http-error");
+const { ERRORS } = require("../utils/const-utils");
 
 // BCrypt Password Salt
 const saltRounds = 10;
@@ -73,13 +74,13 @@ exports.performSignUp = async (username, password, email, lastname, firstname) =
     where: { username }
   });
   if (existingUsername) {
-    throw new LogError("Username already exists", "UniqueUsernameError");
+    throw new HttpError(...ERRORS.UNIQUE.USER_USERNAME);
   }
   const existingEmail = await UserAccount.findOne({
     where: { email }
   });
   if (existingEmail) {
-    throw new LogError("Email already exists", "UniqueEmailError");
+    throw new HttpError(...ERRORS.UNIQUE.USER_EMAIL);
   }
   // Declarations
   const id = new Date().getTime();
@@ -129,7 +130,7 @@ exports.updateUserRole = async (id, role) => {
     where: { id: role }
   });
   if (!existingRole) {
-    throw new LogError("Specified role does not exist", "InvalidRoleError");
+    throw new HttpError(...ERRORS.INVALID.USER_ROLE);
   }
   // Executions
   const results = await UserAccount.update({ role }, { where: { id } });
@@ -151,7 +152,7 @@ exports.deleteUser = async id => {
     where: { id }
   });
   if (!existingUser) {
-    throw new LogError("Specified user cannot be found", "InvalidUserError");
+    throw new HttpError(...ERRORS.INVALID.USER);
   }
   await UserAccount.destroy({ where: { id } });
 };

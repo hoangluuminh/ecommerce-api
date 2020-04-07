@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator");
 
 const { getUserReqMsg, getDatabaseInteractMsg } = require("../utils/logging-utils");
 const { paginationInfo } = require("../utils/pagination-utils");
+const { ERRORS } = require("../utils/const-utils");
 const HttpError = require("../models/http-error");
 
 const itemService = require("../services/item-service");
@@ -18,7 +19,7 @@ exports.getItem = async (req, res, next) => {
     return res.json({ item });
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Retrieving item unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.GET.ITEM));
   }
 };
 
@@ -63,7 +64,7 @@ exports.getItems = async (req, res, next) => {
     });
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Retrieving items unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.GET.ITEMS));
   }
 };
 
@@ -94,9 +95,9 @@ exports.addItem = async (req, res, next) => {
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
     if (error.name === "SequelizeUniqueConstraintError") {
-      return next(new HttpError("Item already exists", 400));
+      return next(new HttpError(...ERRORS.DUPLICATE.ITEM));
     }
-    return next(new HttpError("Adding item unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.ADD.ITEM));
   }
 };
 
@@ -118,12 +119,12 @@ exports.addImgToItem = async (req, res, next) => {
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
     if (error.name === "SequelizeForeignKeyConstraintError") {
-      return next(new HttpError("Specified item cannot be found", 400));
+      return next(new HttpError(...ERRORS.INVALID.ITEM));
     }
     if (error.name === "SequelizeUniqueConstraintError") {
-      return next(new HttpError("Image with specified URL already exists", 400));
+      return next(new HttpError(...ERRORS.DUPLICATE.ITEMIMGURL));
     }
-    return next(new HttpError("Adding image to item unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.ADD.ITEMIMG));
   }
 };
 
@@ -151,12 +152,12 @@ exports.updateItem = async (req, res, next) => {
       category
     );
     if (!result) {
-      return next(new HttpError("Specified item cannot be found", 400));
+      return next(new HttpError(...ERRORS.INVALID.ITEM));
     }
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Updating item unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.UPDATE.ITEM));
   }
 };
 
@@ -177,10 +178,10 @@ exports.swapItemImgs = async (req, res, next) => {
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    if (["ItemImgsNotFoundError"].indexOf(error.name) >= 0) {
-      return next(new HttpError(error.message, 400));
+    if ([ERRORS.INVALID.ITEMIMGS[0]].indexOf(error.name) >= 0) {
+      return next(error);
     }
-    return next(new HttpError("Swapping item images unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.SWAP.ITEMIMGS));
   }
 };
 
@@ -199,12 +200,12 @@ exports.setItemRemain = async (req, res, next) => {
   try {
     const result = await itemService.setItemRemain(id, remain);
     if (!result) {
-      return next(new HttpError("Specified item cannot be found", 400));
+      return next(new HttpError(...ERRORS.INVALID.ITEM));
     }
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Set item remain unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UPDATE.ITEM_REMAIN));
   }
 };
 
@@ -223,12 +224,12 @@ exports.setItemHidden = async (req, res, next) => {
   try {
     const result = await itemService.setItemHidden(id, hidden);
     if (!result) {
-      return next(new HttpError("Specified item cannot be found", 400));
+      return next(new HttpError(...ERRORS.INVALID.ITEM));
     }
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Set item remain unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UPDATE.ITEM_HIDDEN));
   }
 };
 
@@ -240,12 +241,12 @@ exports.deleteItem = async (req, res, next) => {
   try {
     const result = await itemService.deleteItem(itemId);
     if (!result) {
-      return next(new HttpError("Specified item cannot be found", 400));
+      return next(new HttpError(...ERRORS.INVALID.ITEM));
     }
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Deleting item unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.DELETE.ITEM));
   }
 };
 
@@ -265,9 +266,9 @@ exports.deleteItemImg = async (req, res, next) => {
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    if (["ItemImgNotFoundError"].indexOf(error.name) >= 0) {
-      return next(new HttpError(error.message, 400));
+    if ([ERRORS.INVALID.ITEMIMG[0]].indexOf(error.name) >= 0) {
+      return next(error);
     }
-    return next(new HttpError("Deleting item image unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.DELETE.ITEMIMG));
   }
 };

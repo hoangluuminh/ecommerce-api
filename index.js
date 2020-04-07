@@ -6,6 +6,7 @@ require("dotenv").config();
 
 const HttpError = require("./app/models/http-error");
 const LoggingUtil = require("./app/utils/logging-utils");
+const { ERRORS } = require("./app/utils/const-utils");
 
 const itemRoutes = require("./app/routes/item-routes");
 const brandRoutes = require("./app/routes/brand-routes");
@@ -32,7 +33,7 @@ app.use("/api/auth", authRoutes);
 
 // Undefined route Handler
 app.use((req, res, next) => {
-  const error = new HttpError("Could not find this route.", 404);
+  const error = new HttpError(...ERRORS.MISC.ROUTE);
   next(error);
 });
 
@@ -43,7 +44,7 @@ app.use((error, req, res, next) => {
   }
   return res
     .status(error.code || 500)
-    .json({ message: error.message || "An unknown error occured" });
+    .json({ name: error.name || "Error", message: error.message || "An unknown error occured" });
 });
 
 // Database Sync

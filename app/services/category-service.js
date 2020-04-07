@@ -3,7 +3,8 @@ const db = require("../models");
 
 const { Op, fn, col } = db.Sequelize;
 const Category = db.category;
-const LogError = require("../models/log-error");
+const HttpError = require("../models/http-error");
+const { ERRORS } = require("../utils/const-utils");
 
 exports.getCategory = async categoryId => {
   const category = await Category.findOne({
@@ -39,7 +40,7 @@ exports.deleteCategory = async categoryId => {
     raw: true
   });
   if (!category) {
-    throw new LogError("Category cannot be found", "CategoryNotFoundError");
+    throw new HttpError(...ERRORS.INVALID.CATEGORY);
   }
   const categories = await Category.findAll({
     where: {

@@ -1,7 +1,8 @@
 class HttpError extends Error {
-  constructor(message, errorCode) {
+  constructor(name, message, httpStatusCode) {
     super(message); // Add a "message" prop
-    this.code = errorCode; // Add a "code" prop
+    this.name = name; // Add a "name" prop
+    this.code = httpStatusCode; // Add a "code" prop
   }
 }
 

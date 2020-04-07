@@ -3,7 +3,8 @@ const db = require("../models");
 
 const { Op, fn, col } = db.Sequelize;
 const Brand = db.brand;
-const LogError = require("../models/log-error");
+const HttpError = require("../models/http-error");
+const { ERRORS } = require("../utils/const-utils");
 
 // GET: Get brand by id
 exports.getBrand = async (brandId, withChild) => {
@@ -67,10 +68,10 @@ exports.swapBrands = async (brand1Id, brand2Id) => {
     raw: true
   });
   if (!brand1 || !brand2) {
-    throw new LogError("One of the brands cannot be found", "BrandsNotFoundError");
+    throw new HttpError(...ERRORS.INVALID.BRANDS);
   }
   if (brand1.superTH && brand2.superTH && brand1.superTH !== brand2.superTH) {
-    throw new LogError("The brands belong to different parents", "BrandsParentError");
+    throw new HttpError(...ERRORS.MISC.BRANDS_PARENTING);
   }
   const result = db.sequelize.transaction(async t => {
     const brandResults = [
@@ -97,7 +98,7 @@ exports.deleteBrand = async brandId => {
     raw: true
   });
   if (!brand) {
-    throw new LogError("Brand cannot be found", "BrandNotFoundError");
+    throw new HttpError(...ERRORS.INVALID.BRAND);
   }
   const brands = await Brand.findAll({
     where: {

@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator");
 
 const { getUserReqMsg, getDatabaseInteractMsg } = require("../utils/logging-utils");
 const { paginationInfo } = require("../utils/pagination-utils");
+const { ERRORS } = require("../utils/const-utils");
 const HttpError = require("../models/http-error");
 
 const userService = require("../services/user-service");
@@ -28,7 +29,7 @@ exports.getUsers = async (req, res, next) => {
     });
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Retrieving users unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.GET.USERS));
   }
 };
 
@@ -43,7 +44,7 @@ exports.getUser = async (req, res, next) => {
     return res.json({ userAccount });
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Retrieving user unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.GET.USER));
   }
 };
 
@@ -58,7 +59,7 @@ exports.getMeInfo = async (req, res, next) => {
     return res.json({ userAccount });
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Retrieving current user unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.GET.USER_MEINFO));
   }
 };
 
@@ -85,10 +86,10 @@ exports.performSignUp = async (req, res, next) => {
     return res.json({ userAccount });
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    if (["UniqueUsernameError", "UniqueEmailError"].indexOf(error.name) >= 0) {
-      return next(new HttpError(error.message, 400));
+    if ([ERRORS.UNIQUE.USER_USERNAME[0], ERRORS.UNIQUE.USER_EMAIL[0]].indexOf(error.name) >= 0) {
+      return next(error);
     }
-    return next(new HttpError("Signup unsuccessful", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.ADD.USER));
   }
 };
 
@@ -108,12 +109,12 @@ exports.updateMeInfo = async (req, res, next) => {
   try {
     const result = await userService.updateUserInfo(id, lastname, firstname);
     if (!result) {
-      return next(new HttpError("Specified user cannot be found", 400));
+      return next(new HttpError(...ERRORS.INVALID.USER));
     }
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Updating current user unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.UPDATE.USER_MEINFO));
   }
 };
 
@@ -133,14 +134,12 @@ exports.updateMePassword = async (req, res, next) => {
   try {
     const result = await userService.updateUserPassword(id, password);
     if (!result) {
-      return next(new HttpError("Specified user cannot be found", 400));
+      return next(new HttpError(...ERRORS.INVALID.USER));
     }
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(
-      new HttpError("Updating current user's password unsuccessful. Please try again later", 500)
-    );
+    return next(new HttpError(...ERRORS.UNKNOWN.UPDATE.USER_MEPASSWORD));
   }
 };
 
@@ -160,14 +159,12 @@ exports.updateUserPassword = async (req, res, next) => {
   try {
     const result = await userService.updateUserPassword(id, password);
     if (!result) {
-      return next(new HttpError("Specified user cannot be found", 400));
+      return next(new HttpError(...ERRORS.INVALID.USER));
     }
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(
-      new HttpError("Updating user's password unsuccessful. Please try again later", 500)
-    );
+    return next(new HttpError(...ERRORS.UNKNOWN.UPDATE.USER_PASSWORD));
   }
 };
 
@@ -187,17 +184,15 @@ exports.updateUserRole = async (req, res, next) => {
   try {
     const result = await userService.updateUserRole(id, role);
     if (!result) {
-      return next(new HttpError("Specified user cannot be found", 400));
+      return next(new HttpError(...ERRORS.INVALID.USER));
     }
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    if (["InvalidRoleError"].indexOf(error.name) >= 0) {
-      return next(new HttpError(error.message, 400));
+    if ([ERRORS.INVALID.USER_ROLE[0]].indexOf(error.name) >= 0) {
+      return next(error);
     }
-    return next(
-      new HttpError("Resetting user's password unsuccessful. Please try again later", 500)
-    );
+    return next(new HttpError(...ERRORS.UNKNOWN.UPDATE.USER_ROLE));
   }
 };
 
@@ -217,14 +212,12 @@ exports.updateUserLocked = async (req, res, next) => {
   try {
     const result = await userService.updateUserLocked(id, locked);
     if (!result) {
-      return next(new HttpError("Specified user cannot be found", 400));
+      return next(new HttpError(...ERRORS.INVALID.USER));
     }
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(
-      new HttpError("Updating user's locked status unsuccessful. Please try again later", 500)
-    );
+    return next(new HttpError(...ERRORS.UNKNOWN.UPDATE.USER_LOCKED));
   }
 };
 
@@ -245,9 +238,9 @@ exports.deleteUser = async (req, res, next) => {
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    if (["InvalidUserError"].indexOf(error.name) >= 0) {
-      return next(new HttpError(error.message, 400));
+    if ([ERRORS.INVALID.USER[0]].indexOf(error.name) >= 0) {
+      return next(error);
     }
-    return next(new HttpError("Terminating user unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.DELETE.USER));
   }
 };
