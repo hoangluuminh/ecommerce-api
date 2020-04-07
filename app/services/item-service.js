@@ -4,7 +4,8 @@ const db = require("../models");
 const { Op, fn, col } = db.Sequelize;
 const { item: Item, itemImg: ItemImg } = db;
 const { INT_MAX } = require("../utils/const-utils");
-const LogError = require("../models/log-error");
+const HttpError = require("../models/http-error");
+const { ERRORS } = require("../utils/const-utils");
 
 // GET: Get item by id
 exports.getItem = async itemId => {
@@ -199,7 +200,7 @@ exports.swapItemImgs = async (itemId, itemImg1Id, itemImg2Id) => {
     raw: true
   });
   if (!itemImg1 || !itemImg2) {
-    throw new LogError("Cannot find images", "ItemImgsNotFoundError");
+    throw new HttpError(...ERRORS.INVALID.ITEMIMGS);
   }
   const result = db.sequelize.transaction(async t => {
     const results = [
@@ -251,7 +252,7 @@ exports.deleteItemImg = async (itemId, itemImgId) => {
     raw: true
   });
   if (!itemImg) {
-    throw new LogError("Cannot find image", "ItemImgNotFoundError");
+    throw new HttpError(...ERRORS.INVALID.ITEMIMG);
   }
   const { "count(*)": itemImgCount } = await ItemImg.findOne({
     attributes: [fn("count", col("*"))],

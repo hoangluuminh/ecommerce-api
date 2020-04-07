@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator");
 
 const { getUserReqMsg, getDatabaseInteractMsg } = require("../utils/logging-utils");
 // const { paginationInfo } = require('../utils/pagination-utils')
+const { ERRORS } = require("../utils/const-utils");
 const HttpError = require("../models/http-error");
 
 const brandService = require("../services/brand-service");
@@ -19,7 +20,7 @@ exports.getBrand = async (req, res, next) => {
     return res.json({ brand });
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Retrieving brand unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.GET.BRAND));
   }
 };
 
@@ -37,7 +38,7 @@ exports.getBrands = async (req, res, next) => {
     return res.json({ brands });
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Retrieving brands unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.GET.BRANDS));
   }
 };
 
@@ -58,12 +59,12 @@ exports.addBrand = async (req, res, next) => {
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
     if (error.name === "SequelizeUniqueConstraintError") {
-      return next(new HttpError("Brand with specified id already exists", 400));
+      return next(new HttpError(...ERRORS.DUPLICATE.BRAND));
     }
     if (error.name === "SequelizeForeignKeyConstraintError") {
-      return next(new HttpError("Specified parent brand cannot be found", 400));
+      return next(new HttpError(...ERRORS.INVALID.BRAND_PARENT));
     }
-    return next(new HttpError("Adding brand unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.ADD.BRAND));
   }
 };
 
@@ -76,12 +77,12 @@ exports.updateBrand = async (req, res, next) => {
   try {
     const result = await brandService.updateBrand(id, name);
     if (!result) {
-      return next(new HttpError("Specified brand cannot be found", 400));
+      return next(new HttpError(...ERRORS.INVALID.BRAND));
     }
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Updating brand unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.UPDATE.BRAND));
   }
 };
 
@@ -101,10 +102,10 @@ exports.swapBrands = async (req, res, next) => {
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    if (["BrandsNotFoundError", "BrandsParentError"].indexOf(error.name) >= 0) {
-      return next(new HttpError(error.message, 400));
+    if ([ERRORS.INVALID.BRANDS[0], ERRORS.MISC.BRANDS_PARENTING[0]].indexOf(error.name) >= 0) {
+      return next(error);
     }
-    return next(new HttpError("Swapping brands unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.SWAP.BRANDS));
   }
 };
 
@@ -119,11 +120,11 @@ exports.deleteBrand = async (req, res, next) => {
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
     if (["SequelizeForeignKeyConstraintError"].indexOf(error.name) >= 0) {
-      return next(new HttpError("Cannot delete parent brand", 400));
+      return next(new HttpError(...ERRORS.MISC.BRANDS_UNDELETABLEPARENT));
     }
-    if (["BrandNotFoundError"].indexOf(error.name) >= 0) {
-      return next(new HttpError(error.message, 400));
+    if ([ERRORS.INVALID.BRAND[0]].indexOf(error.name) >= 0) {
+      return next(error);
     }
-    return next(new HttpError("Deleting brand unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.DELETE.BRAND));
   }
 };

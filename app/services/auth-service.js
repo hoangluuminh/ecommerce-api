@@ -2,8 +2,9 @@ const bcrypt = require("bcrypt");
 const db = require("../models");
 
 const jwtUtils = require("../utils/jwt-utils");
-const { TOKENLIFE: tokenLife, SECRETKEY: secretKey } = require("../utils/const-utils");
+const { TOKENLIFE: tokenLife, SECRETKEY: secretKey, ERRORS } = require("../utils/const-utils");
 const redisService = require("./redis-service");
+const HttpError = require("../models/http-error");
 const LogError = require("../models/log-error");
 // const { fn, col } = db.Sequelize
 const UserAccount = db.userAccount;
@@ -16,12 +17,12 @@ exports.performLogin = async (username, password, remember) => {
     raw: true
   });
   if (!userAccount) {
-    throw new LogError("Invalid username or password", "AuthUsernameError");
+    throw new HttpError(...ERRORS.AUTH.LOGIN_USERNAME);
   }
   // Check password
   const checkResult = await bcrypt.compare(password, userAccount.password);
   if (!checkResult) {
-    throw new LogError("Invalid username or password", "AuthPasswordError");
+    throw new HttpError(...ERRORS.AUTH.LOGIN_PASSWORD);
   }
   // Create token
   const userData = {
@@ -92,7 +93,7 @@ exports.performRefreshToken = async refreshTokenFromClient => {
   try {
     decoded = await jwtUtils.verifyToken(refreshTokenFromClient, secretKey.refresh);
   } catch (error) {
-    throw new LogError("Invalid refresh token", "JSONWebTokenError");
+    throw new LogError("JSONWebTokenError", "Invalid refresh token");
   }
   // Retrieve Refresh Token list by user id, check if exists
   const userData = decoded.data;
@@ -107,8 +108,8 @@ exports.performRefreshToken = async refreshTokenFromClient => {
   // .then((val) => JSON.parse(val)?.refreshTokens?.find(token => token === refreshTokenFromClient))
   if (!storedRefreshToken || storedRefreshToken !== refreshTokenFromClient) {
     throw new LogError(
-      "No token in system matches the provided, verified token (INTRUDER ALERT!)",
-      "RedisRefreshTokenError"
+      "RedisRefreshTokenError",
+      "No token in system matches the provided, verified token (INTRUDER ALERT!)"
     );
   }
   // Generate new access token if all validations passed

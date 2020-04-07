@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 
 const { getUserReqMsg, getDatabaseInteractMsg } = require("../utils/logging-utils");
+const { ERRORS } = require("../utils/const-utils");
 const HttpError = require("../models/http-error");
 
 const categoryService = require("../services/category-service");
@@ -17,7 +18,7 @@ exports.getCategory = async (req, res, next) => {
     return res.json({ category });
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Retrieving category unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.GET.CATEGORY));
   }
 };
 
@@ -35,7 +36,7 @@ exports.getCategories = async (req, res, next) => {
     return res.json({ categories });
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Retrieving categories unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.GET.CATEGORIES));
   }
 };
 
@@ -56,9 +57,9 @@ exports.addCategory = async (req, res, next) => {
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
     if (error.name === "SequelizeUniqueConstraintError") {
-      return next(new HttpError("Category with specified id already exists", 400));
+      return next(new HttpError(...ERRORS.DUPLICATE.CATEGORY));
     }
-    return next(new HttpError("Adding category unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.ADD.CATEGORY));
   }
 };
 
@@ -71,12 +72,12 @@ exports.updateCategory = async (req, res, next) => {
   try {
     const result = await categoryService.updateCategory(id, name);
     if (!result) {
-      return next(new HttpError("Specified category cannot be found", 400));
+      return next(new HttpError(...ERRORS.INVALID.CATEGORY));
     }
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Updating category unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.UPDATE.CATEGORY));
   }
 };
 
@@ -90,9 +91,9 @@ exports.deleteCategory = async (req, res, next) => {
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    if (["CategoryNotFoundError"].indexOf(error.name) >= 0) {
-      return next(new HttpError(error.message, 400));
+    if ([ERRORS.INVALID.CATEGORY[0]].indexOf(error.name) >= 0) {
+      return next(error);
     }
-    return next(new HttpError("Deleting category unsuccessful. Please try again later", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.DELETE.CATEGORY));
   }
 };

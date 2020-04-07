@@ -1,10 +1,10 @@
 const { validationResult } = require("express-validator");
 const ms = require("ms");
-const { getUserReqMsg, getDatabaseInteractMsg, getAuthMsg } = require("../utils/logging-utils");
+const { getUserReqMsg, getAuthMsg } = require("../utils/logging-utils");
 const HttpError = require("../models/http-error");
 const authService = require("../services/auth-service");
 const { cookieNames, setCookie } = require("../utils/cookie-utils");
-const { TOKENLIFE: tokenLife } = require("../utils/const-utils");
+const { TOKENLIFE: tokenLife, ERRORS } = require("../utils/const-utils");
 
 const controllerName = "auth-controller";
 
@@ -25,7 +25,7 @@ exports.checkRole = (req, res, next) => {
   const { roles } = req.body;
   // Executions
   if (roles.indexOf(req.jwtDecoded.data.role) < 0) {
-    return next(new HttpError("Unauthorized", 403));
+    return next(new HttpError(...ERRORS.AUTH.UNAUTHORIZED));
   }
   return res.status(200).send();
 };
@@ -51,10 +51,10 @@ exports.performLogin = async (req, res, next) => {
     return res.json({ userAccount });
   } catch (error) {
     getAuthMsg(`${controllerName}.${actionName}`, error);
-    if (["AuthUsernameError", "AuthPasswordError"].indexOf(error.name) >= 0) {
-      return next(new HttpError(error.message, 400));
+    if ([ERRORS.AUTH.LOGIN_USERNAME[0], ERRORS.AUTH.LOGIN_PASSWORD[0]].indexOf(error.name) >= 0) {
+      return next(new HttpError(error.name, error.message, error.code));
     }
-    return next(new HttpError("Login unsuccessful", 500));
+    return next(new HttpError(...ERRORS.UNKNOWN.MISC.AUTH_LOGIN));
   }
 };
 
@@ -71,7 +71,7 @@ exports.performSignOut = async (req, res, next) => {
     return res.status(200).send();
   } catch (error) {
     getAuthMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Logout failed", 403));
+    return next(new HttpError(...ERRORS.UNKNOWN.MISC.AUTH_LOGOUT));
   }
 };
 
@@ -87,7 +87,7 @@ exports.performSignOutAllSessions = async (req, res, next) => {
     return res.status(200).send();
   } catch (error) {
     getAuthMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Logout all sessions failed", 403));
+    return next(new HttpError(...ERRORS.UNKNOWN.MISC.AUTH_LOGOUTSESSIONS));
   }
 };
 
@@ -102,6 +102,6 @@ exports.performRefreshToken = async (req, res, next) => {
     return res.status(200).send();
   } catch (error) {
     getAuthMsg(`${controllerName}.${actionName}`, error);
-    return next(new HttpError("Invalid refresh token", 403));
+    return next(new HttpError(...ERRORS.INVALID.AUTH_TOKEN));
   }
 };
