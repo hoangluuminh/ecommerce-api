@@ -1,26 +1,30 @@
 module.exports = (Sequelize, sequelize) => {
-  const Brand = sequelize.define(
-    "Brand",
+  const UserInfo = sequelize.define(
+    "User_Info",
     {
-      id: {
+      userId: {
         type: Sequelize.STRING(50),
         primaryKey: true,
         allowNull: false
       },
-      name: {
-        type: Sequelize.STRING(100),
+      lastName: {
+        type: Sequelize.STRING(50),
         allowNull: false
       },
-      parent: {
+      firstName: {
+        type: Sequelize.STRING(50),
+        allowNull: false
+      },
+      phone: {
         type: Sequelize.STRING(50),
         allowNull: true
       },
-      description: {
-        type: Sequelize.TEXT,
+      gender: {
+        type: Sequelize.STRING(50),
         allowNull: true
       },
-      placing: {
-        type: Sequelize.INTEGER,
+      birthday: {
+        type: Sequelize.DATE,
         allowNull: false
       }
     },
@@ -29,5 +33,5 @@ module.exports = (Sequelize, sequelize) => {
       updatedAt: false
     }
   );
-  return Brand;
+  return UserInfo;
 };

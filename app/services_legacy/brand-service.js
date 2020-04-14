@@ -3,7 +3,7 @@ const db = require("../models");
 
 const { Op, fn, col } = db.Sequelize;
 const Brand = db.brand;
-const HttpError = require("../models/http-error");
+const HttpError = require("../models/classes/http-error");
 const { ERRORS } = require("../utils/const-utils");
 
 // GET: Get brand by id

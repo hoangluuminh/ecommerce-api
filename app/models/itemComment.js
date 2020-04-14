@@ -1,27 +1,22 @@
 module.exports = (Sequelize, sequelize) => {
-  const Brand = sequelize.define(
-    "Brand",
+  const ItemComment = sequelize.define(
+    "Item_Comment",
     {
       id: {
         type: Sequelize.STRING(50),
         primaryKey: true,
         allowNull: false
       },
-      name: {
-        type: Sequelize.STRING(100),
-        allowNull: false
-      },
-      parent: {
+      itemId: {
         type: Sequelize.STRING(50),
-        allowNull: true
-      },
-      description: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
-      placing: {
-        type: Sequelize.INTEGER,
         allowNull: false
+      },
+      userId: {
+        type: Sequelize.STRING(50),
+        allowNull: false
+      },
+      rating: {
+        type: Sequelize.INTEGER
       }
     },
     {
@@ -29,5 +24,5 @@ module.exports = (Sequelize, sequelize) => {
       updatedAt: false
     }
   );
-  return Brand;
+  return ItemComment;
 };

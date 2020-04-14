@@ -1,50 +1,51 @@
 module.exports = (Sequelize, sequelize) => {
-  const Item = sequelize.define(
-    "Item",
+  const Order = sequelize.define(
+    "Order",
     {
       id: {
         type: Sequelize.STRING(50),
         primaryKey: true,
         allowNull: false
       },
-      name: {
+      userId: {
         type: Sequelize.STRING(50),
         allowNull: false
       },
-      typeId: {
+      verifier: {
         type: Sequelize.STRING(50),
-        allowNull: false
-      },
-      brandId: {
-        type: Sequelize.STRING(50),
-        allowNull: false
-      },
-      year: {
-        type: Sequelize.INTEGER,
         allowNull: true
       },
-      price: {
-        type: Sequelize.FLOAT,
+      status: {
+        type: Sequelize.STRING(50),
         allowNull: false
       },
-      rating: {
-        type: Sequelize.INTEGER,
-        defaultValue: 5,
+      completedAt: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
+      totalPrice: {
+        type: Sequelize.DOUBLE,
         allowNull: false
       },
-      ratingCount: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
+      paymentMethod: {
+        type: Sequelize.STRING(50),
         allowNull: false
       },
-      blog: {
+      isPaid: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false
+      },
+      delivery_fullname: {
+        type: Sequelize.STRING(50),
+        allowNull: false
+      },
+      delivery_phone: {
+        type: Sequelize.STRING(50),
+        allowNull: false
+      },
+      delivery_address: {
         type: Sequelize.TEXT,
         allowNull: false
-      },
-      hidden: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
       }
     },
     {
@@ -52,6 +53,5 @@ module.exports = (Sequelize, sequelize) => {
       updatedAt: "updatedAt"
     }
   );
-
-  return Item;
+  return Order;
 };

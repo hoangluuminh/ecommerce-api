@@ -1,7 +1,7 @@
 const { validationResult } = require("express-validator");
 const ms = require("ms");
 const { getUserReqMsg, getAuthMsg } = require("../utils/logging-utils");
-const HttpError = require("../models/http-error");
+const HttpError = require("../models/classes/http-error");
 const authService = require("../services/auth-service");
 const { cookieNames, setCookie } = require("../utils/cookie-utils");
 const { TOKENLIFE: tokenLife, ERRORS } = require("../utils/const-utils");

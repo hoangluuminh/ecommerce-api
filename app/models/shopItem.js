@@ -1,6 +1,6 @@
 module.exports = (Sequelize, sequelize) => {
-  const ItemImg = sequelize.define(
-    "Item_Img",
+  const ShopItem = sequelize.define(
+    "Shop_Item",
     {
       id: {
         type: Sequelize.INTEGER,
@@ -8,16 +8,22 @@ module.exports = (Sequelize, sequelize) => {
         allowNull: false,
         autoIncrement: true
       },
+      shopId: {
+        type: Sequelize.STRING(50),
+        allowNull: false
+      },
       itemId: {
         type: Sequelize.STRING(50),
         allowNull: false
       },
-      mediaId: {
-        type: Sequelize.INTEGER,
+      variationId: {
+        type: Sequelize.STRING(50),
         allowNull: false
       },
-      placing: {
-        type: Sequelize.INTEGER
+      available: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
       }
     },
     {
@@ -25,5 +31,5 @@ module.exports = (Sequelize, sequelize) => {
       updatedAt: false
     }
   );
-  return ItemImg;
+  return ShopItem;
 };

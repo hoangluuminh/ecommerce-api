@@ -4,7 +4,7 @@ const db = require("../models");
 const { Op, fn, col } = db.Sequelize;
 const { item: Item, itemImg: ItemImg } = db;
 const { INT_MAX } = require("../utils/const-utils");
-const HttpError = require("../models/http-error");
+const HttpError = require("../models/classes/http-error");
 const { ERRORS } = require("../utils/const-utils");
 
 // GET: Get item by id

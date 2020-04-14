@@ -1,6 +1,6 @@
 module.exports = (Sequelize, sequelize) => {
-  const ItemImg = sequelize.define(
-    "Item_Img",
+  const ItemAttribute = sequelize.define(
+    "Item_Attribute",
     {
       id: {
         type: Sequelize.INTEGER,
@@ -8,15 +8,19 @@ module.exports = (Sequelize, sequelize) => {
         allowNull: false,
         autoIncrement: true
       },
+      attributeId: {
+        type: Sequelize.STRING(50),
+        allowNull: false
+      },
       itemId: {
         type: Sequelize.STRING(50),
         allowNull: false
       },
-      mediaId: {
-        type: Sequelize.INTEGER,
+      value: {
+        type: Sequelize.STRING(50),
         allowNull: false
       },
-      placing: {
+      rating: {
         type: Sequelize.INTEGER
       }
     },
@@ -25,5 +29,5 @@ module.exports = (Sequelize, sequelize) => {
       updatedAt: false
     }
   );
-  return ItemImg;
+  return ItemAttribute;
 };

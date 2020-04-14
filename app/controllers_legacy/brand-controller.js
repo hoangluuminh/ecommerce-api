@@ -3,7 +3,7 @@ const { validationResult } = require("express-validator");
 const { getUserReqMsg, getDatabaseInteractMsg } = require("../utils/logging-utils");
 // const { paginationInfo } = require('../utils/pagination-utils')
 const { ERRORS } = require("../utils/const-utils");
-const HttpError = require("../models/http-error");
+const HttpError = require("../models/classes/http-error");
 
 const brandService = require("../services/brand-service");
 

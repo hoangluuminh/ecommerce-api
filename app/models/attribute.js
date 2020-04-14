@@ -1,6 +1,6 @@
 module.exports = (Sequelize, sequelize) => {
-  const Category = sequelize.define(
-    "Category",
+  const Attribute = sequelize.define(
+    "Attribute",
     {
       id: {
         type: Sequelize.STRING(50),
@@ -8,8 +8,16 @@ module.exports = (Sequelize, sequelize) => {
         allowNull: false
       },
       name: {
-        type: Sequelize.STRING(100),
+        type: Sequelize.STRING(50),
+        allowNull: false
+      },
+      description: {
+        type: Sequelize.TEXT,
         allowNull: true
+      },
+      valueType: {
+        type: Sequelize.STRING(50),
+        allowNull: false
       },
       placing: {
         type: Sequelize.INTEGER
@@ -20,5 +28,5 @@ module.exports = (Sequelize, sequelize) => {
       updatedAt: false
     }
   );
-  return Category;
+  return Attribute;
 };

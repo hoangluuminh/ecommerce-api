@@ -4,15 +4,15 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
-const HttpError = require("./app/models/http-error");
+const HttpError = require("./app/models/classes/http-error");
 const LoggingUtil = require("./app/utils/logging-utils");
 const { ERRORS } = require("./app/utils/const-utils");
 
-const itemRoutes = require("./app/routes/item-routes");
-const brandRoutes = require("./app/routes/brand-routes");
-const categoryRoutes = require("./app/routes/category-routes");
-const userRoutes = require("./app/routes/user-routes");
-const authRoutes = require("./app/routes/auth-routes");
+// const itemRoutes = require("./app/routes/item-routes");
+// const brandRoutes = require("./app/routes/brand-routes");
+// const categoryRoutes = require("./app/routes/category-routes");
+// const userRoutes = require("./app/routes/user-routes");
+// const authRoutes = require("./app/routes/auth-routes");
 
 const app = express();
 app.use(bodyParser.json());
@@ -25,11 +25,11 @@ app.use(
 );
 
 // Route Handlers
-app.use("/api/items", itemRoutes);
-app.use("/api/brands", brandRoutes);
-app.use("/api/categories", categoryRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/auth", authRoutes);
+// app.use("/api/items", itemRoutes);
+// app.use("/api/brands", brandRoutes);
+// app.use("/api/categories", categoryRoutes);
+// app.use("/api/users", userRoutes);
+// app.use("/api/auth", authRoutes);
 
 // Undefined route Handler
 app.use((req, res, next) => {

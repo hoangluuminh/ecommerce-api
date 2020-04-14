@@ -1,6 +1,6 @@
 module.exports = (Sequelize, sequelize) => {
-  const Brand = sequelize.define(
-    "Brand",
+  const Promotion = sequelize.define(
+    "Promotion",
     {
       id: {
         type: Sequelize.STRING(50),
@@ -8,20 +8,26 @@ module.exports = (Sequelize, sequelize) => {
         allowNull: false
       },
       name: {
-        type: Sequelize.STRING(100),
+        type: Sequelize.STRING(50),
         allowNull: false
       },
-      parent: {
-        type: Sequelize.STRING(50),
-        allowNull: true
+      timeStart: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
+      timeEnd: {
+        type: Sequelize.DATE,
+        allowNull: false
       },
       description: {
         type: Sequelize.TEXT,
         allowNull: true
       },
-      placing: {
-        type: Sequelize.INTEGER,
-        allowNull: false
+      offPercent: {
+        type: Sequelize.INTEGER
+      },
+      autoApplied: {
+        type: Sequelize.BOOLEAN
       }
     },
     {
@@ -29,5 +35,5 @@ module.exports = (Sequelize, sequelize) => {
       updatedAt: false
     }
   );
-  return Brand;
+  return Promotion;
 };
