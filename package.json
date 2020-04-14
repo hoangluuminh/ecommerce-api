@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "startDev": "nodemon --inspect index.js"
+    "startDev": "nodemon --inspect index.js",
+    "dataseed": "node dataseed.js"
   },
   "author": "Luu Minh Hoang",
   "license": "ISC",

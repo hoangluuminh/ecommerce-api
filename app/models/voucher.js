@@ -1,6 +1,6 @@
 module.exports = (Sequelize, sequelize) => {
-  const ItemImg = sequelize.define(
-    "Item_Img",
+  const Voucher = sequelize.define(
+    "Voucher",
     {
       id: {
         type: Sequelize.INTEGER,
@@ -8,22 +8,23 @@ module.exports = (Sequelize, sequelize) => {
         allowNull: false,
         autoIncrement: true
       },
-      itemId: {
+      promoId: {
         type: Sequelize.STRING(50),
         allowNull: false
       },
-      mediaId: {
-        type: Sequelize.INTEGER,
+      code: {
+        type: Sequelize.STRING(50),
         allowNull: false
       },
-      placing: {
-        type: Sequelize.INTEGER
+      used: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false
       }
     },
     {
-      createdAt: false,
+      createdAt: "createdAt",
       updatedAt: false
     }
   );
-  return ItemImg;
+  return Voucher;
 };

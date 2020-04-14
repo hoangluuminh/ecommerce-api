@@ -1,23 +1,23 @@
 module.exports = (Sequelize, sequelize) => {
-  const Brand = sequelize.define(
-    "Brand",
+  const ItemVariation = sequelize.define(
+    "Item_Variation",
     {
       id: {
         type: Sequelize.STRING(50),
         primaryKey: true,
         allowNull: false
       },
-      name: {
-        type: Sequelize.STRING(100),
+      itemId: {
+        type: Sequelize.STRING(50),
         allowNull: false
       },
-      parent: {
+      name: {
         type: Sequelize.STRING(50),
-        allowNull: true
+        allowNull: false
       },
-      description: {
-        type: Sequelize.TEXT,
-        allowNull: true
+      colors: {
+        type: Sequelize.STRING(50),
+        allowNull: false
       },
       placing: {
         type: Sequelize.INTEGER,
@@ -29,5 +29,5 @@ module.exports = (Sequelize, sequelize) => {
       updatedAt: false
     }
   );
-  return Brand;
+  return ItemVariation;
 };

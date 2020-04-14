@@ -3,7 +3,7 @@ const db = require("../models");
 
 const { Op, fn, col } = db.Sequelize;
 const Category = db.category;
-const HttpError = require("../models/http-error");
+const HttpError = require("../models/classes/http-error");
 const { ERRORS } = require("../utils/const-utils");
 
 exports.getCategory = async categoryId => {

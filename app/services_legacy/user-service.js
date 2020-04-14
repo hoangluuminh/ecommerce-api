@@ -3,7 +3,7 @@ const db = require("../models");
 
 const { Op } = db.Sequelize;
 const { userAccount: UserAccount, userRole: UserRole } = db;
-const HttpError = require("../models/http-error");
+const HttpError = require("../models/classes/http-error");
 const { ERRORS } = require("../utils/const-utils");
 
 // BCrypt Password Salt

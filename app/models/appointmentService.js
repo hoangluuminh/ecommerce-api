@@ -1,9 +1,9 @@
 module.exports = (Sequelize, sequelize) => {
-  const UserRole = sequelize.define(
-    "User_Role",
+  const AppointmentService = sequelize.define(
+    "Appointment_Service",
     {
       id: {
-        type: Sequelize.STRING(100),
+        type: Sequelize.STRING(50),
         primaryKey: true,
         allowNull: false
       },
@@ -12,7 +12,8 @@ module.exports = (Sequelize, sequelize) => {
         allowNull: false
       },
       description: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
+        allowNull: true
       }
     },
     {
@@ -20,6 +21,5 @@ module.exports = (Sequelize, sequelize) => {
       updatedAt: false
     }
   );
-
-  return UserRole;
+  return AppointmentService;
 };

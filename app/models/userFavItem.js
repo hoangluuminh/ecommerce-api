@@ -1,6 +1,6 @@
 module.exports = (Sequelize, sequelize) => {
-  const ItemImg = sequelize.define(
-    "Item_Img",
+  const UserFavItem = sequelize.define(
+    "User_Fav_Item",
     {
       id: {
         type: Sequelize.INTEGER,
@@ -12,18 +12,19 @@ module.exports = (Sequelize, sequelize) => {
         type: Sequelize.STRING(50),
         allowNull: false
       },
-      mediaId: {
-        type: Sequelize.INTEGER,
+      userId: {
+        type: Sequelize.STRING(50),
         allowNull: false
       },
-      placing: {
-        type: Sequelize.INTEGER
+      price: {
+        type: Sequelize.FLOAT,
+        allowNull: false
       }
     },
     {
-      createdAt: false,
+      createdAt: "createdAt",
       updatedAt: false
     }
   );
-  return ItemImg;
+  return UserFavItem;
 };

@@ -6,5 +6,5 @@ module.exports = {
   DB: process.env.MYSQL_DB,
   dialect: "mysql",
   pool: { max: 50, min: 0, acquire: 30000, idle: 10000 },
-  logging: false
+  logging: true
 };

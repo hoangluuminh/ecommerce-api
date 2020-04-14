@@ -2,7 +2,7 @@ const { validationResult } = require("express-validator");
 
 const { getUserReqMsg, getDatabaseInteractMsg } = require("../utils/logging-utils");
 const { ERRORS } = require("../utils/const-utils");
-const HttpError = require("../models/http-error");
+const HttpError = require("../models/classes/http-error");
 
 const categoryService = require("../services/category-service");
 

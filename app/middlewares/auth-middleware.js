@@ -1,5 +1,5 @@
 const jwtUtils = require("../utils/jwt-utils");
-const HttpError = require("../models/http-error");
+const HttpError = require("../models/classes/http-error");
 const { getAuthMsg } = require("../utils/logging-utils");
 const { cookieNames } = require("../utils/cookie-utils");
 const { ERRORS } = require("../utils/const-utils");

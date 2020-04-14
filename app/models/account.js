@@ -1,9 +1,9 @@
 module.exports = (Sequelize, sequelize) => {
-  const UserAccount = sequelize.define(
-    "User_Account",
+  const Account = sequelize.define(
+    "Account",
     {
       id: {
-        type: Sequelize.STRING(100),
+        type: Sequelize.STRING(50),
         primaryKey: true,
         allowNull: false
       },
@@ -18,29 +18,17 @@ module.exports = (Sequelize, sequelize) => {
       email: {
         type: Sequelize.STRING(50),
         allowNull: false
-      },
-      lastname: {
-        type: Sequelize.STRING(50)
-      },
-      firstname: {
-        type: Sequelize.STRING(50)
-      },
-      role: {
-        type: Sequelize.STRING(50),
-        allowNull: false
-      },
-      locked: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0
       }
     },
     {
       indexes: [
         { unique: true, fields: ["username"] },
         { unique: true, fields: ["email"] }
-      ]
+      ],
+      createdAt: "createdAt",
+      updatedAt: "updatedAt"
     }
   );
 
-  return UserAccount;
+  return Account;
 };
