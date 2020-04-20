@@ -23,6 +23,10 @@ module.exports = (Sequelize, sequelize) => {
         type: Sequelize.STRING(50),
         allowNull: false
       },
+      note: {
+        type: Sequelize.TEXT,
+        allowNull: false
+      },
       status: {
         type: Sequelize.STRING(50),
         allowNull: false

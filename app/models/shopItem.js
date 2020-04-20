@@ -3,10 +3,9 @@ module.exports = (Sequelize, sequelize) => {
     "Shop_Item",
     {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(50),
         primaryKey: true,
-        allowNull: false,
-        autoIncrement: true
+        allowNull: false
       },
       shopId: {
         type: Sequelize.STRING(50),

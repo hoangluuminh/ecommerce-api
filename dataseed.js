@@ -158,8 +158,14 @@ async function dataSeed() {
 
       // types
       const types = await Promise.all([
-        db.type.create({ id: "car", name: "Cars", placing: 0 }, { transaction: t }),
-        db.type.create({ id: "motorcycle", name: "Motorcycles", placing: 1 }, { transaction: t }),
+        db.type.create(
+          { id: "car", name: "Cars", cartRestrict: true, placing: 0 },
+          { transaction: t }
+        ),
+        db.type.create(
+          { id: "motorcycle", name: "Motorcycles", cartRestrict: true, placing: 1 },
+          { transaction: t }
+        ),
         db.type.create({ id: "accessories", name: "Accessories", placing: 2 }, { transaction: t })
       ]);
       await Promise.all([
@@ -169,6 +175,7 @@ async function dataSeed() {
             id: "sedan",
             name: "Sedan",
             parent: types[0].id,
+            cartRestrict: true,
             placing: 0
           },
           { transaction: t }
@@ -178,6 +185,7 @@ async function dataSeed() {
             id: "suv",
             name: "SUV",
             parent: types[0].id,
+            cartRestrict: true,
             placing: 1
           },
           { transaction: t }
@@ -187,6 +195,7 @@ async function dataSeed() {
             id: "hatchback",
             name: "Hatchback",
             parent: types[0].id,
+            cartRestrict: true,
             placing: 2
           },
           { transaction: t }
@@ -196,6 +205,7 @@ async function dataSeed() {
             id: "mpv",
             name: "MPV",
             parent: types[0].id,
+            cartRestrict: true,
             placing: 3
           },
           { transaction: t }
@@ -205,6 +215,7 @@ async function dataSeed() {
             id: "pickup",
             name: "Pick-up",
             parent: types[0].id,
+            cartRestrict: true,
             placing: 4
           },
           { transaction: t }
@@ -214,6 +225,7 @@ async function dataSeed() {
             id: "van",
             name: "Van",
             parent: types[0].id,
+            cartRestrict: true,
             placing: 5
           },
           { transaction: t }
@@ -223,6 +235,7 @@ async function dataSeed() {
             id: "coupe",
             name: "Coupe",
             parent: types[0].id,
+            cartRestrict: true,
             placing: 5
           },
           { transaction: t }
@@ -233,6 +246,7 @@ async function dataSeed() {
             id: "scooter",
             name: "Scooter",
             parent: types[1].id,
+            cartRestrict: true,
             placing: 0
           },
           { transaction: t }
@@ -242,6 +256,7 @@ async function dataSeed() {
             id: "sport-bike",
             name: "Sport Bike",
             parent: types[1].id,
+            cartRestrict: true,
             placing: 1
           },
           { transaction: t }
@@ -282,26 +297,44 @@ async function dataSeed() {
           {
             id: "seat",
             name: "Seating", // 4, 7
-            valueType: "string",
+            valueType: "static",
             placing: 0
           },
           { transaction: t }
         ),
         db.attribute.create(
           {
-            id: "fuel-consume-mpg",
-            name: "MPG", // 26 27 28...
-            valueType: "number",
+            id: "top-speed",
+            name: "Top speed", // 155...
+            valueType: "dynamic",
             placing: 1
           },
           { transaction: t }
         ),
         db.attribute.create(
           {
-            id: "fuel-consume-lpkm",
-            name: "Liter/100km", // 2,17
-            valueType: "number",
+            id: "top-speed-unit",
+            name: "Top speed Unit", // mph, km/h
+            valueType: "static",
             placing: 2
+          },
+          { transaction: t }
+        ),
+        db.attribute.create(
+          {
+            id: "fuel-consume",
+            name: "Fuel consumption", // 26 27 28...
+            valueType: "dynamic",
+            placing: 3
+          },
+          { transaction: t }
+        ),
+        db.attribute.create(
+          {
+            id: "fuel-consume-unit",
+            name: "Fuel consumption Unit", // MPG, l/100km
+            valueType: "static",
+            placing: 4
           },
           { transaction: t }
         ),
@@ -309,8 +342,8 @@ async function dataSeed() {
           {
             id: "transmission",
             name: "Transmission", // Automatic, Manual, Automanual
-            valueType: "string",
-            placing: 3
+            valueType: "static",
+            placing: 5
           },
           { transaction: t }
         ),
@@ -318,8 +351,8 @@ async function dataSeed() {
           {
             id: "fuel",
             name: "Fuel", // Gasoline, Petrol, Electric, Hybrid
-            valueType: "string",
-            placing: 4
+            valueType: "static",
+            placing: 6
           },
           { transaction: t }
         ),
@@ -327,8 +360,8 @@ async function dataSeed() {
           {
             id: "drivetrain",
             name: "Drivetrain", // FWD, RWD, 4WD, 4x2, 4x4, Other
-            valueType: "string",
-            placing: 5
+            valueType: "static",
+            placing: 7
           },
           { transaction: t }
         ),
@@ -336,62 +369,62 @@ async function dataSeed() {
           {
             id: "engine",
             name: "Engine", // TwinPower Turbo, Biturbo
-            valueType: "string",
-            placing: 6
-          },
-          { transaction: t }
-        ),
-        db.attribute.create(
-          {
-            id: "cylinder-count",
-            name: "Cylinder Count", // 1, 2, 3, 4, 5, 6, 8, 10, 12, Other
-            valueType: "string",
-            placing: 7
-          },
-          { transaction: t }
-        ),
-        db.attribute.create(
-          {
-            id: "cylinder-capacity",
-            name: "Cylinder Capacity (cc)", // 149,3
-            valueType: "number",
+            valueType: "static",
             placing: 8
           },
           { transaction: t }
         ),
         db.attribute.create(
           {
-            id: "weight-lbs",
-            name: "Weight (lbs)", // 100 1000 ,...
-            valueType: "number",
+            id: "cylinder-count",
+            name: "Cylinder count", // 1, 2, 3, 4, 5, 6, 8, 10, 12,...
+            valueType: "dynamic",
             placing: 9
           },
           { transaction: t }
         ),
         db.attribute.create(
           {
-            id: "weight-kg",
-            name: "Weight (kg)", // 100 1000 ,...
-            valueType: "number",
+            id: "cylinder-capacity",
+            name: "Cylinder capacity (cc)", // 149,3
+            valueType: "dynamic",
             placing: 10
           },
           { transaction: t }
         ),
         db.attribute.create(
           {
-            id: "fuel-capacity-g",
-            name: "Fuel Capacity (gallon)", // 100 1000 ,...
-            valueType: "number",
+            id: "weight",
+            name: "Weight", // 100 1000 ,...
+            valueType: "dynamic",
             placing: 11
           },
           { transaction: t }
         ),
         db.attribute.create(
           {
-            id: "fuel-capacity-l",
-            name: "Fuel Capacity (litre)", // 100 1000 ,...
-            valueType: "number",
+            id: "weight-unit",
+            name: "Weight Unit", // lbs, kg
+            valueType: "static",
             placing: 12
+          },
+          { transaction: t }
+        ),
+        db.attribute.create(
+          {
+            id: "fuel-capacity",
+            name: "Fuel capacity", // 100 1000 ,...
+            valueType: "dynamic",
+            placing: 13
+          },
+          { transaction: t }
+        ),
+        db.attribute.create(
+          {
+            id: "fuel-capacity-unit",
+            name: "Fuel capacity Unit", //gallon, litre
+            valueType: "static",
+            placing: 14
           },
           { transaction: t }
         ),
@@ -399,8 +432,8 @@ async function dataSeed() {
           {
             id: "starter",
             name: "Starter", // Electric
-            valueType: "string",
-            placing: 13
+            valueType: "static",
+            placing: 15
           },
           { transaction: t }
         )
@@ -408,12 +441,30 @@ async function dataSeed() {
       // attributeType
       await Promise.all([
         db.attributeType.create({ attributeId: "seat", typeId: "car" }, { transaction: t }),
+        db.attributeType.create({ attributeId: "top-speed", typeId: "car" }, { transaction: t }),
         db.attributeType.create(
-          { attributeId: "fuel-consume-mpg", typeId: "car" },
+          { attributeId: "top-speed", typeId: "motorcycle" },
           { transaction: t }
         ),
         db.attributeType.create(
-          { attributeId: "fuel-consume-lpkm", typeId: "motorcycle" },
+          { attributeId: "top-speed-unit", typeId: "car" },
+          { transaction: t }
+        ),
+        db.attributeType.create(
+          { attributeId: "top-speed-unit", typeId: "motorcycle" },
+          { transaction: t }
+        ),
+        db.attributeType.create({ attributeId: "fuel-consume", typeId: "car" }, { transaction: t }),
+        db.attributeType.create(
+          { attributeId: "fuel-consume", typeId: "motorcycle" },
+          { transaction: t }
+        ),
+        db.attributeType.create(
+          { attributeId: "fuel-consume-unit", typeId: "car" },
+          { transaction: t }
+        ),
+        db.attributeType.create(
+          { attributeId: "fuel-consume-unit", typeId: "motorcycle" },
           { transaction: t }
         ),
         db.attributeType.create({ attributeId: "transmission", typeId: "car" }, { transaction: t }),
@@ -437,17 +488,30 @@ async function dataSeed() {
           { attributeId: "cylinder-capacity", typeId: "motorcycle" },
           { transaction: t }
         ),
-        db.attributeType.create({ attributeId: "weight-lbs", typeId: "car" }, { transaction: t }),
+        db.attributeType.create({ attributeId: "weight", typeId: "car" }, { transaction: t }),
         db.attributeType.create(
-          { attributeId: "weight-kg", typeId: "motorcycle" },
+          { attributeId: "weight", typeId: "motorcycle" },
+          { transaction: t }
+        ),
+        db.attributeType.create({ attributeId: "weight-unit", typeId: "car" }, { transaction: t }),
+        db.attributeType.create(
+          { attributeId: "weight-unit", typeId: "motorcycle" },
           { transaction: t }
         ),
         db.attributeType.create(
-          { attributeId: "fuel-capacity-g", typeId: "car" },
+          { attributeId: "fuel-capacity", typeId: "car" },
           { transaction: t }
         ),
         db.attributeType.create(
-          { attributeId: "fuel-capacity-l", typeId: "motorcycle" },
+          { attributeId: "fuel-capacity", typeId: "motorcycle" },
+          { transaction: t }
+        ),
+        db.attributeType.create(
+          { attributeId: "fuel-capacity-unit", typeId: "car" },
+          { transaction: t }
+        ),
+        db.attributeType.create(
+          { attributeId: "fuel-capacity-unit", typeId: "motorcycle" },
           { transaction: t }
         ),
         db.attributeType.create(

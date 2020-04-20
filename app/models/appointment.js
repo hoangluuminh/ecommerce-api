@@ -7,10 +7,6 @@ module.exports = (Sequelize, sequelize) => {
         primaryKey: true,
         allowNull: false
       },
-      serviceId: {
-        type: Sequelize.STRING(50),
-        allowNull: false
-      },
       shopId: {
         type: Sequelize.STRING(50),
         allowNull: false
@@ -25,6 +21,10 @@ module.exports = (Sequelize, sequelize) => {
       },
       email: {
         type: Sequelize.STRING(50),
+        allowNull: false
+      },
+      note: {
+        type: Sequelize.TEXT,
         allowNull: false
       },
       time: {
