@@ -12,10 +12,6 @@ module.exports = (Sequelize, sequelize) => {
         type: Sequelize.STRING(50),
         allowNull: false
       },
-      itemId: {
-        type: Sequelize.STRING(50),
-        allowNull: false
-      },
       item_name: {
         type: Sequelize.STRING(50),
         allowNull: false
@@ -27,6 +23,10 @@ module.exports = (Sequelize, sequelize) => {
       item_quantity: {
         type: Sequelize.INTEGER,
         allowNull: false
+      },
+      item_shopItem: {
+        type: Sequelize.STRING(50),
+        allowNull: true
       }
     },
     {

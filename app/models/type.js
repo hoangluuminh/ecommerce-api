@@ -19,6 +19,11 @@ module.exports = (Sequelize, sequelize) => {
         type: Sequelize.TEXT,
         allowNull: true
       },
+      cartRestrict: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+      },
       placing: {
         type: Sequelize.INTEGER,
         allowNull: false

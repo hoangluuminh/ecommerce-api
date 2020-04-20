@@ -5,7 +5,6 @@ const account = require("./account");
 const accountStaff = require("./accountStaff");
 const accountUser = require("./accountUser");
 const appointment = require("./appointment");
-const appointmentService = require("./appointmentService");
 const attribute = require("./attribute");
 const attributeType = require("./attributeType");
 const brand = require("./brand");
@@ -45,7 +44,6 @@ const db = {
   accountStaff: accountStaff(Sequelize, sequelize),
   accountUser: accountUser(Sequelize, sequelize),
   appointment: appointment(Sequelize, sequelize),
-  appointmentService: appointmentService(Sequelize, sequelize),
   attribute: attribute(Sequelize, sequelize),
   attributeType: attributeType(Sequelize, sequelize),
   brand: brand(Sequelize, sequelize),
@@ -107,13 +105,7 @@ db.accountUser.hasMany(db.supportTicket, {
   foreignKey: "customer"
 });
 
-db.appointment.belongsTo(db.appointmentService, { as: "Service", foreignKey: "serviceId" });
 db.appointment.belongsTo(db.shop, { as: "Shop", foreignKey: "shopId" });
-
-db.appointmentService.hasMany(db.appointment, {
-  as: "Appointments",
-  foreignKey: "accountId"
-});
 
 db.attribute.hasMany(db.itemAttribute, {
   as: "ItemAttributes",
@@ -133,7 +125,6 @@ db.item.belongsTo(db.type, { as: "Type", foreignKey: "typeId" });
 db.item.belongsTo(db.brand, { as: "Brand", foreignKey: "brandId" });
 db.item.hasMany(db.itemImg, { as: "Imgs", foreignKey: "itemId", onDelete: "CASCADE" });
 db.item.hasMany(db.itemAttribute, { as: "Attributes", foreignKey: "itemId", onDelete: "CASCADE" });
-db.item.hasMany(db.orderDetail, { as: "OrderDetails", foreignKey: "itemId", onDelete: "CASCADE" });
 db.item.hasMany(db.shopItem, { as: "Inventory", foreignKey: "itemId", onDelete: "CASCADE" });
 db.item.hasMany(db.itemVariation, { as: "Variations", foreignKey: "itemId", onDelete: "CASCADE" });
 db.item.hasMany(db.userFavItem, { as: "UserFavs", foreignKey: "itemId", onDelete: "CASCADE" });
@@ -171,7 +162,7 @@ db.order.hasMany(db.supportTicket, {
 });
 
 db.orderDetail.belongsTo(db.order, { as: "Order", foreignKey: "orderId" });
-db.orderDetail.belongsTo(db.item, { as: "Item", foreignKey: "itemId" });
+db.orderDetail.belongsTo(db.shopItem, { as: "ShopItem", foreignKey: "item_shopItem" });
 
 db.promotion.hasMany(db.promotionItem, {
   as: "PromotionItems",
@@ -190,6 +181,7 @@ db.shop.hasMany(db.appointment, { as: "Appointments", foreignKey: "shopId", onDe
 db.shopItem.belongsTo(db.shop, { as: "Shop", foreignKey: "shopId" });
 db.shopItem.belongsTo(db.item, { as: "Item", foreignKey: "itemId" });
 db.shopItem.belongsTo(db.itemVariation, { as: "Variation", foreignKey: "variationId" });
+db.shopItem.hasMany(db.orderDetail, { as: "OrderDetails", foreignKey: "item_shopItem" });
 
 db.staffRole.hasMany(db.accountStaff, { as: "Staffs", foreignKey: "roleId" });
 
