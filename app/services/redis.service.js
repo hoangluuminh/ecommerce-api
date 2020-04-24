@@ -1,5 +1,5 @@
 const redis = require("async-redis");
-const redisConfig = require("../config/redis.config");
+const redisConfig = require("../configs/redis.config");
 
 exports.redisClientInit = () => {
   return redis.createClient({

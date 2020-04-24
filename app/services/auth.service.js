@@ -1,39 +1,79 @@
 const bcrypt = require("bcrypt");
 const db = require("../models");
+const { Op } = db.Sequelize;
 
-const jwtUtils = require("../utils/jwt-utils");
-const { TOKENLIFE: tokenLife, SECRETKEY: secretKey, ERRORS } = require("../utils/const-utils");
-const redisService = require("./redis-service");
+const authConfig = require("../configs/auth.config");
+const jwtUtils = require("../utils/jwt.utils");
+const { TOKENLIFE: tokenLife, SECRETKEY: secretKey, ERRORS } = require("../utils/const.utils");
+const redisService = require("./redis.service");
 const HttpError = require("../models/classes/http-error");
 const LogError = require("../models/classes/log-error");
 // const { fn, col } = db.Sequelize
-const UserAccount = db.userAccount;
+const { account: Account, accountStaff: AccountStaff, accountUser: AccountUser } = db;
 // const UserRole = db.userRole
 
-exports.performLogin = async (username, password, remember) => {
-  // Get user account
-  const userAccount = await UserAccount.findOne({
-    where: { username },
-    raw: true
+exports.performLogin = async (req, username, password, remember) => {
+  // Get account
+  const checkInWhere =
+    req.authFor === authConfig.identifier.STAFF
+      ? { model: AccountStaff, as: "Staff", modelAlias: "Staff", instanceAlias: "accountStaff" }
+      : { model: AccountUser, as: "User", modelAlias: "User", instanceAlias: "accountUser" };
+  const accountInstance = await Account.findOne({
+    include: [
+      {
+        model: checkInWhere.model,
+        as: checkInWhere.as,
+        include: [
+          {
+            model: Account,
+            as: "Account",
+            where: {
+              [Op.or]: {
+                username,
+                email: username
+              }
+            },
+            required: true
+          }
+        ],
+        required: true
+      }
+    ]
   });
-  if (!userAccount) {
+  if (!accountInstance) {
     throw new HttpError(...ERRORS.AUTH.LOGIN_USERNAME);
   }
+
   // Check password
-  const checkResult = await bcrypt.compare(password, userAccount.password);
+  const checkResult = await bcrypt.compare(password, accountInstance.password);
   if (!checkResult) {
     throw new HttpError(...ERRORS.AUTH.LOGIN_PASSWORD);
   }
+
+  // Check locked
+  if (accountInstance[checkInWhere.modelAlias].locked === true) {
+    throw new HttpError(...ERRORS.AUTH.ISLOCKED);
+  }
+
   // Create token
   const userData = {
-    id: userAccount.id,
-    username: userAccount.username,
-    email: userAccount.email,
-    role: userAccount.role,
-    locked: userAccount.locked
+    id: accountInstance.id,
+    [`${checkInWhere.instanceAlias}Id`]: accountInstance[checkInWhere.modelAlias].id,
+    username: accountInstance.username,
+    email: accountInstance.email,
+    role: accountInstance.role
   };
+  if (req.authFor === authConfig.identifier.STAFF) {
+    // Append role into userData if signing into MANAGE
+    const accountStaffInstance = await AccountStaff.findOne({
+      where: { accountId: accountInstance.id },
+      raw: true
+    });
+    userData.role = accountStaffInstance.roleId;
+  }
   const accessToken = await jwtUtils.generateToken(userData, secretKey.access, tokenLife.access);
   const refreshToken = await jwtUtils.generateToken(userData, secretKey.refresh, tokenLife.refresh);
+
   // (Remember me) Save Refresh Token to Redis
   // If no "Remember", client should not be able to perform refresh token => Not saving to Redis
   if (remember) {
@@ -47,41 +87,34 @@ exports.performLogin = async (username, password, remember) => {
     storedRefreshTokens.push(refreshToken);
     await redisClient.set(userData.id, JSON.stringify({ refreshTokens: storedRefreshTokens }));
   }
+
   return {
     accessToken,
     refreshToken,
-    userAccount: {
-      id: userAccount.id,
-      username: userAccount.username,
-      email: userAccount.email,
-      lastname: userAccount.lastname,
-      firstname: userAccount.firstname,
-      createdAt: userAccount.createdAt,
-      updatedAt: userAccount.updatedAt
-    }
+    account: userData
   };
 };
 
-exports.performSignOut = async (refreshTokenFromClient, userId) => {
+exports.performSignOut = async (refreshTokenFromClient, accountId) => {
   // Establish Redis connection
   const redisClient = redisService.redisClientInit();
-  // Remove Refresh Token from refreshToken list based on cookie's token and userId
+  // Remove Refresh Token from refreshToken list based on cookie's token and accountId
   const updatedRefreshTokens = await redisClient
-    .get(userId)
+    .get(accountId)
     .then(val =>
       (JSON.parse(val) ? JSON.parse(val).refreshTokens : []).filter(
         token => token !== refreshTokenFromClient
       )
     );
-  await redisClient.set(userId, JSON.stringify({ refreshTokens: updatedRefreshTokens }));
+  await redisClient.set(accountId, JSON.stringify({ refreshTokens: updatedRefreshTokens }));
   return 1;
 };
 
-exports.performSignOutAllSessions = async userId => {
+exports.performSignOutAllSessions = async accountId => {
   // Establish Redis connection
   const redisClient = redisService.redisClientInit();
-  // Delete refreshToken from Redis based on userId
-  await redisClient.del(userId);
+  // Delete refreshToken from Redis based on accountId
+  await redisClient.del(accountId);
   return 1;
 };
 
