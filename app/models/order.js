@@ -35,17 +35,21 @@ module.exports = (Sequelize, sequelize) => {
         type: Sequelize.BOOLEAN,
         allowNull: false
       },
+      shopId: {
+        type: Sequelize.STRING(50),
+        allowNull: true
+      },
       delivery_fullname: {
         type: Sequelize.STRING(50),
-        allowNull: false
+        allowNull: true
       },
       delivery_phone: {
         type: Sequelize.STRING(50),
-        allowNull: false
+        allowNull: true
       },
       delivery_address: {
         type: Sequelize.TEXT,
-        allowNull: false
+        allowNull: true
       }
     },
     {

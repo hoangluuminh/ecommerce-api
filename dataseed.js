@@ -1,15 +1,12 @@
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 const db = require("./app/models");
+
+const generateId = require("./app/utils/id.utils");
+const companyName = require("./app/configs/business.config");
+
 // BCrypt Password Salt
 const saltRounds = 10;
-
-const companyName = "Autogo";
-
-const getMili = () =>
-  `${new Date().getTime()}${Math.random()
-    .toString(36)
-    .substring(7)}`;
 
 async function dataSeed() {
   try {
@@ -26,7 +23,7 @@ async function dataSeed() {
       const accounts = await Promise.all([
         db.account.create(
           {
-            id: getMili(),
+            id: generateId(),
             username: "admin",
             password: hashedPassword,
             email: "admin@autogoshop.com"
@@ -35,7 +32,7 @@ async function dataSeed() {
         ),
         db.account.create(
           {
-            id: getMili(),
+            id: generateId(),
             username: "manager",
             password: hashedPassword,
             email: "manager@autogoshop.com"
@@ -44,7 +41,7 @@ async function dataSeed() {
         ),
         db.account.create(
           {
-            id: getMili(),
+            id: generateId(),
             username: "merchandiser",
             password: hashedPassword,
             email: "merchandiser@autogoshop.com"
@@ -53,7 +50,7 @@ async function dataSeed() {
         ),
         db.account.create(
           {
-            id: getMili(),
+            id: generateId(),
             username: "support",
             password: hashedPassword,
             email: "support@autogoshop.com"
@@ -62,7 +59,7 @@ async function dataSeed() {
         ),
         db.account.create(
           {
-            id: getMili(),
+            id: generateId(),
             username: "hoangluuminh",
             password: hashedPassword,
             email: "hoangluuminh@autogoshop.com"
@@ -72,22 +69,22 @@ async function dataSeed() {
       ]);
       const usersAndStaffs = await Promise.all([
         db.accountStaff.create(
-          { id: getMili(), accountId: accounts[0].id, roleId: "admin" },
+          { id: generateId(), accountId: accounts[0].id, roleId: "admin" },
           { transaction: t }
         ),
         db.accountStaff.create(
-          { id: getMili(), accountId: accounts[1].id, roleId: "manager" },
+          { id: generateId(), accountId: accounts[1].id, roleId: "manager" },
           { transaction: t }
         ),
         db.accountStaff.create(
-          { id: getMili(), accountId: accounts[2].id, roleId: "merchandiser" },
+          { id: generateId(), accountId: accounts[2].id, roleId: "merchandiser" },
           { transaction: t }
         ),
         db.accountStaff.create(
-          { id: getMili(), accountId: accounts[3].id, roleId: "support" },
+          { id: generateId(), accountId: accounts[3].id, roleId: "support" },
           { transaction: t }
         ),
-        db.accountUser.create({ id: getMili(), accountId: accounts[4].id }, { transaction: t })
+        db.accountUser.create({ id: generateId(), accountId: accounts[4].id }, { transaction: t })
       ]);
       // info and address for user
       const thatUserId = usersAndStaffs[4].id;

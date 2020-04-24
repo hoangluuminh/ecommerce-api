@@ -1,5 +1,5 @@
 const Sequelize = require("sequelize");
-const dbConfig = require("../config/db.config");
+const dbConfig = require("../configs/db.config");
 
 const account = require("./account");
 const accountStaff = require("./accountStaff");
@@ -155,6 +155,7 @@ db.media.hasMany(db.itemImg, { as: "ItemImgs", foreignKey: "mediaId" });
 
 db.order.belongsTo(db.accountUser, { as: "Customer", foreignKey: "userId" });
 db.order.belongsTo(db.accountStaff, { as: "Verifier", foreignKey: "verifier" });
+db.order.belongsTo(db.shop, { as: "Shop", foreignKey: "shopId" });
 db.order.hasMany(db.orderDetail, { as: "Items", foreignKey: "orderId", onDelete: "CASCADE" });
 db.order.hasMany(db.supportTicket, {
   as: "SupportTickets",
