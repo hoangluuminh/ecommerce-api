@@ -11,6 +11,8 @@ exports.SECRETKEY = {
 exports.ERRORS = {
   INVALID: {
     AUTH_TOKEN: ["InvalidTokenError", "Invalid refresh token", 403],
+    MEDIA_TYPE: ["InvalidFileTypeError", "Invalid file type", 400],
+    MEDIA_URL: ["InvalidMediaUrlError", "File with specified name cannot be found", 404],
     // ITEM: ["InvalidItemError", "Specified item cannot be found", 400],
     // ITEMIMG: ["InvalidItemImgError", "Cannot find image", 400],
     // ITEMIMGS: ["InvalidItemImgsError", "Cannot find images", 400],
@@ -42,7 +44,8 @@ exports.ERRORS = {
     LOGIN_PASSWORD: ["AuthPasswordError", "Invalid username/email or password", 400]
   },
   MISC: {
-    ROUTE: ["RouteError", "Could not find this route.", 404]
+    ROUTE: ["RouteError", "Could not find this route.", 404],
+    MEDIA_FILESIZE: ["ExceedingFileSizeError", "Maximum size exceeded.", 400]
     // BRANDS_PARENTING: ["BrandsParentingError", "The brands belong to different parents", 400],
     // BRANDS_UNDELETABLEPARENT: ["UndeletableParentBrandError", "You cannot delete parent brand", 400]
   },
@@ -52,6 +55,7 @@ exports.ERRORS = {
     UPDATE: ["UnknownUpdateError", "Updating unsuccessful. Please try again later", 500],
     SWAP: ["UnknownSwapImgsError", "Swapping unsuccessful. Please try again later", 500],
     DELETE: ["UnknownDeleteError", "Deleting unsuccessful. Please try again later", 500],
+    UPLOAD: ["UnknownUploadError", "Uploading unsuccessful. Please try again later", 500],
     AUTH: {
       LOGIN: ["UnknownLoginError", "Login unsuccessful", 500],
       LOGOUT: ["UnknownLogoutError", "Logout failed", 403],

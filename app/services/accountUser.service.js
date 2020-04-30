@@ -2,9 +2,10 @@ const bcrypt = require("bcrypt");
 const validator = require("validator");
 
 const db = require("../models");
-const { Op } = db.Sequelize;
 
+const { Op } = db.Sequelize;
 const { account: Account, accountUser: AccountUser, userInfo: UserInfo } = db;
+
 const HttpError = require("../models/classes/http-error");
 const { ERRORS } = require("../utils/const.utils");
 const generateId = require("../utils/id.utils");
@@ -205,11 +206,11 @@ exports.updateUserInfo = async (id, lastName, firstName, phone, gender, birthday
     throw new HttpError(...ERRORS.INVALID.ACCOUNTUSER);
   }
   // Executions
-  const results = await UserInfo.update(
+  await UserInfo.update(
     { lastName, firstName, phone, gender, birthday },
     { where: { userId: id } }
   );
-  return results[0];
+  return true;
 };
 
 // PATCH: Update user password
@@ -238,8 +239,7 @@ exports.updateAccountUserPassword = async (id, password, oldPassword) => {
   // Hash password
   const hashedPassword = await bcrypt.hash(password, saltRounds);
   // Executions
-  const results = await Account.update({ password: hashedPassword }, { where: { id: account.id } });
-  return results[0];
+  await Account.update({ password: hashedPassword }, { where: { id: account.id } });
 };
 
 // PATCH: Update user's access to system
@@ -261,11 +261,11 @@ exports.updateAccountUserLocked = async (id, locked) => {
     throw new HttpError(...ERRORS.INVALID.ACCOUNTUSER);
   }
   // Executions
-  const results = await AccountUser.update({ locked }, { where: { id } });
+  await AccountUser.update({ locked }, { where: { id } });
   if (locked === true) {
     await performSignOutAllSessions(account.id);
   }
-  return results[0];
+  return true;
 };
 
 // DELETE: Terminate user's account
