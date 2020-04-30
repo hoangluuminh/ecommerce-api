@@ -195,8 +195,8 @@ exports.updateAccountStaffPassword = async (id, password, oldPassword) => {
   // Hash password
   const hashedPassword = await bcrypt.hash(password, saltRounds);
   // Executions
-  const results = await Account.update({ password: hashedPassword }, { where: { id: account.id } });
-  return results[0];
+  await Account.update({ password: hashedPassword }, { where: { id: account.id } });
+  return true;
 };
 
 // PATCH: Update staff's role
@@ -218,8 +218,8 @@ exports.updateStaffRole = async (id, roleId) => {
     throw new HttpError(...ERRORS.INVALID.ACCOUNTSTAFF);
   }
   // Executions
-  const results = await AccountStaff.update({ roleId }, { where: { id } });
-  return results[0];
+  await AccountStaff.update({ roleId }, { where: { id } });
+  return true;
 };
 
 // PATCH: Update user's access to system
@@ -241,11 +241,11 @@ exports.updateAccountStaffLocked = async (id, locked) => {
     throw new HttpError(...ERRORS.INVALID.ACCOUNTSTAFF);
   }
   // Executions
-  const results = await AccountStaff.update({ locked }, { where: { id } });
+  await AccountStaff.update({ locked }, { where: { id } });
   if (locked === true) {
     await performSignOutAllSessions(account.id);
   }
-  return results[0];
+  return true;
 };
 
 // DELETE: Terminate user's account

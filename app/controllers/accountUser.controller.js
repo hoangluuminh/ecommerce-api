@@ -128,7 +128,7 @@ exports.updateMeAccountUser = async (req, res, next) => {
   const { lastName, firstName, phone, gender, birthday } = req.body;
   // Executions
   try {
-    const result = await accountUserService.updateUserInfo(
+    await accountUserService.updateUserInfo(
       accountUserId,
       lastName,
       firstName,
@@ -136,9 +136,6 @@ exports.updateMeAccountUser = async (req, res, next) => {
       gender,
       birthday
     );
-    if (!result) {
-      return next(new HttpError(...ERRORS.INVALID.ACCOUNTUSER));
-    }
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
@@ -210,13 +207,13 @@ exports.updateAccountUserLocked = async (req, res, next) => {
   const { locked } = req.body;
   // Executions
   try {
-    const result = await accountUserService.updateAccountUserLocked(id, locked);
-    if (!result) {
-      return next(new HttpError(...ERRORS.INVALID.ACCOUNTUSER));
-    }
+    await accountUserService.updateAccountUserLocked(id, locked);
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
+    if ([ERRORS.INVALID.ACCOUNTUSER[0]].indexOf(error.name) >= 0) {
+      return next(error);
+    }
     return next(new HttpError(...ERRORS.UNKNOWN.UPDATE));
   }
 };
