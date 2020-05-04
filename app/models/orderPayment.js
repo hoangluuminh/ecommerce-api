@@ -1,6 +1,6 @@
 module.exports = (Sequelize, sequelize) => {
-  const OrderDetail = sequelize.define(
-    "Order_Detail",
+  const OrderPayment = sequelize.define(
+    "Order_Payment",
     {
       id: {
         type: Sequelize.INTEGER,
@@ -12,27 +12,23 @@ module.exports = (Sequelize, sequelize) => {
         type: Sequelize.STRING(50),
         allowNull: false
       },
-      item_name: {
+      paymentMethodId: {
         type: Sequelize.STRING(50),
         allowNull: false
       },
-      item_price: {
+      paymentAmount: {
         type: Sequelize.FLOAT,
         allowNull: false
       },
-      item_quantity: {
-        type: Sequelize.INTEGER,
+      isPaid: {
+        type: Sequelize.BOOLEAN,
         allowNull: false
-      },
-      item_inventoryId: {
-        type: Sequelize.STRING(50),
-        allowNull: true
       }
     },
     {
-      createdAt: false,
-      updatedAt: false
+      createdAt: "createdAt",
+      updatedAt: "updatedAt"
     }
   );
-  return OrderDetail;
+  return OrderPayment;
 };

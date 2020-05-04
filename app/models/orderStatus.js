@@ -1,18 +1,13 @@
 module.exports = (Sequelize, sequelize) => {
-  const AttributeType = sequelize.define(
-    "Attribute_Type",
+  const OrderStatus = sequelize.define(
+    "Order_Status",
     {
       id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        allowNull: false,
-        autoIncrement: true
-      },
-      attributeId: {
         type: Sequelize.STRING(50),
+        primaryKey: true,
         allowNull: false
       },
-      typeId: {
+      name: {
         type: Sequelize.STRING(50),
         allowNull: false
       }
@@ -22,5 +17,5 @@ module.exports = (Sequelize, sequelize) => {
       updatedAt: false
     }
   );
-  return AttributeType;
+  return OrderStatus;
 };

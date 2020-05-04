@@ -3,7 +3,7 @@ require("dotenv").config();
 const db = require("./app/models");
 
 const generateId = require("./app/utils/id.utils");
-const companyName = require("./app/configs/business.config");
+const { companyName } = require("./app/configs/business.config");
 
 // BCrypt Password Salt
 const saltRounds = 10;
@@ -99,79 +99,28 @@ async function dataSeed() {
             birthday: new Date()
           },
           { transaction: t }
-        ),
-        db.userAddress.create(
-          {
-            userId: thatUserId,
-            fullName: "Lưu Minh Hoàng",
-            phone: "09080909008",
-            address: "100 Everyhere",
-            isMain: true
-          },
-          { transaction: t }
-        ),
-        db.userAddress.create(
-          {
-            userId: thatUserId,
-            fullName: "Hoang Lưu Mình",
-            phone: "09080909009",
-            address: "102 Everynowandthen",
-            isMain: false
-          },
-          { transaction: t }
         )
       ]);
 
       // brands
-      const brands = await Promise.all([
+      await Promise.all([
         db.brand.create({ id: "tesla", name: "Tesla", placing: 0 }, { transaction: t }),
         db.brand.create({ id: "ford", name: "Ford", placing: 1 }, { transaction: t }),
         db.brand.create({ id: "ferrari", name: "Ferrari", placing: 2 }, { transaction: t }),
         db.brand.create(
           { id: "mercedes-benz", name: "Mercedes Benz", placing: 3 },
           { transaction: t }
-        )
-      ]);
-      await Promise.all([
-        db.brand.create(
-          {
-            id: "ford-mustang",
-            name: "Ford Mustang",
-            parent: brands[1].id,
-            placing: 0
-          },
-          { transaction: t }
         ),
-        db.brand.create(
-          {
-            id: "fork-mustard",
-            name: "Fork & Mustard",
-            parent: brands[1].id,
-            placing: 1
-          },
-          { transaction: t }
-        )
+        db.brand.create({ id: "bmw", name: "BMW", placing: 4 }, { transaction: t })
       ]);
 
       // types
-      const types = await Promise.all([
-        db.type.create(
-          { id: "car", name: "Cars", cartRestrict: true, placing: 0 },
-          { transaction: t }
-        ),
-        db.type.create(
-          { id: "motorcycle", name: "Motorcycles", cartRestrict: true, placing: 1 },
-          { transaction: t }
-        ),
-        db.type.create({ id: "accessories", name: "Accessories", placing: 2 }, { transaction: t })
-      ]);
       await Promise.all([
         // Cars
         db.type.create(
           {
             id: "sedan",
             name: "Sedan",
-            parent: types[0].id,
             cartRestrict: true,
             placing: 0
           },
@@ -181,7 +130,6 @@ async function dataSeed() {
           {
             id: "suv",
             name: "SUV",
-            parent: types[0].id,
             cartRestrict: true,
             placing: 1
           },
@@ -191,7 +139,6 @@ async function dataSeed() {
           {
             id: "hatchback",
             name: "Hatchback",
-            parent: types[0].id,
             cartRestrict: true,
             placing: 2
           },
@@ -201,7 +148,6 @@ async function dataSeed() {
           {
             id: "mpv",
             name: "MPV",
-            parent: types[0].id,
             cartRestrict: true,
             placing: 3
           },
@@ -211,7 +157,6 @@ async function dataSeed() {
           {
             id: "pickup",
             name: "Pick-up",
-            parent: types[0].id,
             cartRestrict: true,
             placing: 4
           },
@@ -221,7 +166,6 @@ async function dataSeed() {
           {
             id: "van",
             name: "Van",
-            parent: types[0].id,
             cartRestrict: true,
             placing: 5
           },
@@ -231,58 +175,8 @@ async function dataSeed() {
           {
             id: "coupe",
             name: "Coupe",
-            parent: types[0].id,
             cartRestrict: true,
-            placing: 5
-          },
-          { transaction: t }
-        ),
-        // Motorcycles
-        db.type.create(
-          {
-            id: "scooter",
-            name: "Scooter",
-            parent: types[1].id,
-            cartRestrict: true,
-            placing: 0
-          },
-          { transaction: t }
-        ),
-        db.type.create(
-          {
-            id: "sport-bike",
-            name: "Sport Bike",
-            parent: types[1].id,
-            cartRestrict: true,
-            placing: 1
-          },
-          { transaction: t }
-        ),
-        // Accessories
-        db.type.create(
-          {
-            id: "floor-mats",
-            name: "Floor Mats",
-            parent: types[2].id,
-            placing: 0
-          },
-          { transaction: t }
-        ),
-        db.type.create(
-          {
-            id: "seat-covers",
-            name: "Seat Covers",
-            parent: types[2].id,
-            placing: 1
-          },
-          { transaction: t }
-        ),
-        db.type.create(
-          {
-            id: "infotainment",
-            name: "Infotainment",
-            parent: types[2].id,
-            placing: 2
+            placing: 6
           },
           { transaction: t }
         )
@@ -419,7 +313,7 @@ async function dataSeed() {
         db.attribute.create(
           {
             id: "fuel-capacity-unit",
-            name: "Fuel capacity Unit", //gallon, litre
+            name: "Fuel capacity Unit", // gallon, litre
             valueType: "static",
             placing: 14
           },
@@ -432,87 +326,6 @@ async function dataSeed() {
             valueType: "static",
             placing: 15
           },
-          { transaction: t }
-        )
-      ]);
-      // attributeType
-      await Promise.all([
-        db.attributeType.create({ attributeId: "seat", typeId: "car" }, { transaction: t }),
-        db.attributeType.create({ attributeId: "top-speed", typeId: "car" }, { transaction: t }),
-        db.attributeType.create(
-          { attributeId: "top-speed", typeId: "motorcycle" },
-          { transaction: t }
-        ),
-        db.attributeType.create(
-          { attributeId: "top-speed-unit", typeId: "car" },
-          { transaction: t }
-        ),
-        db.attributeType.create(
-          { attributeId: "top-speed-unit", typeId: "motorcycle" },
-          { transaction: t }
-        ),
-        db.attributeType.create({ attributeId: "fuel-consume", typeId: "car" }, { transaction: t }),
-        db.attributeType.create(
-          { attributeId: "fuel-consume", typeId: "motorcycle" },
-          { transaction: t }
-        ),
-        db.attributeType.create(
-          { attributeId: "fuel-consume-unit", typeId: "car" },
-          { transaction: t }
-        ),
-        db.attributeType.create(
-          { attributeId: "fuel-consume-unit", typeId: "motorcycle" },
-          { transaction: t }
-        ),
-        db.attributeType.create({ attributeId: "transmission", typeId: "car" }, { transaction: t }),
-        db.attributeType.create({ attributeId: "fuel", typeId: "car" }, { transaction: t }),
-        db.attributeType.create({ attributeId: "fuel", typeId: "motorcycle" }, { transaction: t }),
-        db.attributeType.create({ attributeId: "drivetrain", typeId: "car" }, { transaction: t }),
-        db.attributeType.create({ attributeId: "engine", typeId: "car" }, { transaction: t }),
-        db.attributeType.create(
-          { attributeId: "engine", typeId: "motorcycle" },
-          { transaction: t }
-        ),
-        db.attributeType.create(
-          { attributeId: "cylinder-count", typeId: "car" },
-          { transaction: t }
-        ),
-        db.attributeType.create(
-          { attributeId: "cylinder-count", typeId: "motorcycle" },
-          { transaction: t }
-        ),
-        db.attributeType.create(
-          { attributeId: "cylinder-capacity", typeId: "motorcycle" },
-          { transaction: t }
-        ),
-        db.attributeType.create({ attributeId: "weight", typeId: "car" }, { transaction: t }),
-        db.attributeType.create(
-          { attributeId: "weight", typeId: "motorcycle" },
-          { transaction: t }
-        ),
-        db.attributeType.create({ attributeId: "weight-unit", typeId: "car" }, { transaction: t }),
-        db.attributeType.create(
-          { attributeId: "weight-unit", typeId: "motorcycle" },
-          { transaction: t }
-        ),
-        db.attributeType.create(
-          { attributeId: "fuel-capacity", typeId: "car" },
-          { transaction: t }
-        ),
-        db.attributeType.create(
-          { attributeId: "fuel-capacity", typeId: "motorcycle" },
-          { transaction: t }
-        ),
-        db.attributeType.create(
-          { attributeId: "fuel-capacity-unit", typeId: "car" },
-          { transaction: t }
-        ),
-        db.attributeType.create(
-          { attributeId: "fuel-capacity-unit", typeId: "motorcycle" },
-          { transaction: t }
-        ),
-        db.attributeType.create(
-          { attributeId: "starter", typeId: "motorcycle" },
           { transaction: t }
         )
       ]);
@@ -549,6 +362,401 @@ async function dataSeed() {
             name: "Aftersales inquiry",
             description:
               "Receive assistance for purchased products/orders (unexpected quality, manufacturing issues, refund, etc.)"
+          },
+          { transaction: t }
+        )
+      ]);
+
+      // shop
+      await db.shop.create(
+        {
+          id: "mainshop",
+          name: `${companyName} Showroom 1`,
+          locationLng: "1",
+          locationLat: "1",
+          address: "100-102 Somewhere in this world",
+          description: `${companyName} main showroom`
+        },
+        { transaction: t }
+      );
+
+      // paymentMethod
+      await db.paymentMethod.create({ id: "cash", name: "Cash" }, { transaction: t });
+      await db.paymentMethod.create({ id: "cc", name: "Credit Card" }, { transaction: t });
+
+      // orderStatus
+      await db.orderStatus.create({ id: "processing", name: "Processing" }, { transaction: t });
+      await db.orderStatus.create({ id: "paid", name: "Paid" }, { transaction: t });
+      await db.orderStatus.create({ id: "received", name: "Received" }, { transaction: t });
+      await db.orderStatus.create({ id: "canceled", name: "Canceled" }, { transaction: t });
+
+      /* USER-GENERATED */
+
+      // item
+      await db.item.create(
+        {
+          id: "bmw-unknownicar-2018-01",
+          name: "BMW Unknownicar",
+          typeId: "coupe",
+          brandId: "bmw",
+          year: "2018",
+          price: 10000,
+          blog: "Car description",
+          hidden: false
+        },
+        { transaction: t }
+      );
+      await Promise.all([
+        db.itemAttribute.create(
+          {
+            attributeId: "seat",
+            itemId: "bmw-unknownicar-2018-01",
+            value: "2", // 4, 7
+            rating: 5
+          },
+          { transaction: t }
+        ),
+        db.itemAttribute.create(
+          {
+            attributeId: "top-speed",
+            itemId: "bmw-unknownicar-2018-01",
+            value: "155", // 155...
+            rating: 5
+          },
+          { transaction: t }
+        ),
+        db.itemAttribute.create(
+          {
+            attributeId: "top-speed-unit",
+            itemId: "bmw-unknownicar-2018-01",
+            value: "mph", // mph, km/h
+            rating: 5
+          },
+          { transaction: t }
+        ),
+        db.itemAttribute.create(
+          {
+            attributeId: "fuel-consume",
+            itemId: "bmw-unknownicar-2018-01",
+            value: "28", // 26 27 28...
+            rating: 5
+          },
+          { transaction: t }
+        ),
+        db.itemAttribute.create(
+          {
+            attributeId: "fuel-consume-unit",
+            itemId: "bmw-unknownicar-2018-01",
+            value: "MPG", // MPG, l/100km
+            rating: 5
+          },
+          { transaction: t }
+        ),
+        db.itemAttribute.create(
+          {
+            attributeId: "transmission",
+            itemId: "bmw-unknownicar-2018-01",
+            value: "Manual", // Automatic, Manual, Automanual
+            rating: 5
+          },
+          { transaction: t }
+        ),
+        db.itemAttribute.create(
+          {
+            attributeId: "fuel",
+            itemId: "bmw-unknownicar-2018-01",
+            value: "Petrol", // Gasoline, Petrol, Electric, Hybrid
+            rating: 5
+          },
+          { transaction: t }
+        ),
+        db.itemAttribute.create(
+          {
+            attributeId: "drivetrain",
+            itemId: "bmw-unknownicar-2018-01",
+            value: "AWD", // FWD, RWD, 4WD, 4x2, 4x4, Other
+            rating: 5
+          },
+          { transaction: t }
+        ),
+        db.itemAttribute.create(
+          {
+            attributeId: "engine",
+            itemId: "bmw-unknownicar-2018-01",
+            value: "TwinPower Turbo", // TwinPower Turbo, Biturbo
+            rating: 5
+          },
+          { transaction: t }
+        ),
+        db.itemAttribute.create(
+          {
+            attributeId: "weight",
+            itemId: "bmw-unknownicar-2018-01",
+            value: "1000", // 100 1000 ,...
+            rating: 5
+          },
+          { transaction: t }
+        ),
+        db.itemAttribute.create(
+          {
+            attributeId: "weight-unit",
+            itemId: "bmw-unknownicar-2018-01",
+            value: "lbs", // lbs, kg
+            rating: 5
+          },
+          { transaction: t }
+        ),
+        db.itemAttribute.create(
+          {
+            attributeId: "fuel-capacity",
+            itemId: "bmw-unknownicar-2018-01",
+            value: "100", // 100 1000 ,...
+            rating: 5
+          },
+          { transaction: t }
+        ),
+        db.itemAttribute.create(
+          {
+            attributeId: "fuel-capacity-unit",
+            itemId: "bmw-unknownicar-2018-01",
+            value: "gallon", // gallon, litre
+            rating: 5
+          },
+          { transaction: t }
+        )
+      ]);
+      const variationRedId = generateId();
+      const variationNightBlueId = generateId();
+      await Promise.all([
+        db.itemVariation.create(
+          {
+            id: variationRedId,
+            itemId: "bmw-unknownicar-2018-01",
+            name: "Red",
+            colors: "FF0000",
+            placing: 0
+          },
+          { transaction: t }
+        ),
+        db.itemVariation.create(
+          {
+            id: variationNightBlueId,
+            itemId: "bmw-unknownicar-2018-01",
+            name: "Night Blue",
+            colors: "0057FF,303030",
+            placing: 1
+          },
+          { transaction: t }
+        )
+      ]);
+      await Promise.all([
+        db.inventory.create(
+          {
+            id: "1HGBH41JXMN000001",
+            itemId: "bmw-unknownicar-2018-01",
+            variationId: variationRedId,
+            available: true,
+            bought: false
+          },
+          { transaction: t }
+        ),
+        db.inventory.create(
+          {
+            id: "1HGBH41JXMN000002",
+            itemId: "bmw-unknownicar-2018-01",
+            variationId: variationNightBlueId,
+            available: true,
+            bought: true
+          },
+          { transaction: t }
+        )
+      ]);
+      await db.media.create(
+        { url: "0cQhD0me2_unknownicar.png", description: "" },
+        { transaction: t }
+      );
+      await db.media.create(
+        { url: "0cQhD0me3_unknownicar2.png", description: "" },
+        { transaction: t }
+      );
+      await db.media.create(
+        { url: "0cQhD0me4_unknownicar3.png", description: "" },
+        { transaction: t }
+      );
+      await db.media.create(
+        { url: "0cQhD0me5_unknownicar4.png", description: "" },
+        { transaction: t }
+      );
+      await Promise.all([
+        db.itemImg.create(
+          {
+            itemId: "bmw-unknownicar-2018-01",
+            mediaId: 1,
+            placing: 0
+          },
+          { transaction: t }
+        ),
+        db.itemImg.create(
+          {
+            itemId: "bmw-unknownicar-2018-01",
+            mediaId: 2,
+            placing: 1
+          },
+          { transaction: t }
+        ),
+        db.itemImg.create(
+          {
+            itemId: "bmw-unknownicar-2018-01",
+            mediaId: 3,
+            placing: 2
+          },
+          { transaction: t }
+        ),
+        db.itemImg.create(
+          {
+            itemId: "bmw-unknownicar-2018-01",
+            mediaId: 4,
+            placing: 3
+          },
+          { transaction: t }
+        )
+      ]);
+      await db.userFavItem.create(
+        { itemId: "bmw-unknownicar-2018-01", userId: thatUserId, price: 10000 },
+        { transaction: t }
+      );
+      await db.itemComment.create(
+        {
+          id: generateId(),
+          itemId: "bmw-unknownicar-2018-01",
+          userId: thatUserId,
+          rating: 5,
+          comment: "This car is so cool, it puts Elon Musk to shame!!!"
+        },
+        { transaction: t }
+      );
+
+      // promotion, promotionItem, voucher
+      const promotion1 = await db.promotion.create(
+        {
+          id: generateId(),
+          name: "Forever Sale",
+          timeStart: new Date(),
+          timeEnd: new Date("2030"),
+          description: "Selected products are sale-off forever!",
+          offPercent: 5,
+          autoApplied: true
+        },
+        { transaction: t }
+      );
+      const promotion2 = await db.promotion.create(
+        {
+          id: generateId(),
+          name: "Secret Voucher",
+          timeStart: new Date(),
+          timeEnd: new Date("2030"),
+          description: "Get 10% off with this secret voucher",
+          offPercent: 10,
+          autoApplied: false
+        },
+        { transaction: t }
+      );
+      await db.promotionItem.create(
+        { promoId: promotion1.id, itemId: "bmw-unknownicar-2018-01" },
+        { transaction: t }
+      );
+      await db.promotionItem.create(
+        { promoId: promotion2.id, itemId: "bmw-unknownicar-2018-01" },
+        { transaction: t }
+      );
+      await Promise.all([
+        db.voucher.create(
+          {
+            promoId: promotion2.id,
+            code: "UUDDLRLRBAS0",
+            used: false,
+            createdAt: new Date(Date.now())
+          },
+          { transaction: t }
+        ),
+        db.voucher.create(
+          {
+            promoId: promotion2.id,
+            code: "UUDDLRLRBAS1",
+            used: false,
+            createdAt: new Date(Date.now())
+          },
+          { transaction: t }
+        ),
+        db.voucher.create(
+          {
+            promoId: promotion2.id,
+            code: "UUDDLRLRBAS2",
+            used: false,
+            createdAt: new Date(Date.now())
+          },
+          { transaction: t }
+        ),
+        db.voucher.create(
+          {
+            promoId: promotion2.id,
+            code: "UUDDLRLRBAS3",
+            used: false,
+            createdAt: new Date(Date.now())
+          },
+          { transaction: t }
+        ),
+        db.voucher.create(
+          {
+            promoId: promotion2.id,
+            code: "UUDDLRLRBAS4",
+            used: false,
+            createdAt: new Date(Date.now())
+          },
+          { transaction: t }
+        ),
+        db.voucher.create(
+          {
+            promoId: promotion2.id,
+            code: "UUDDLRLRBAS5",
+            used: false,
+            createdAt: new Date(Date.now())
+          },
+          { transaction: t }
+        ),
+        db.voucher.create(
+          {
+            promoId: promotion2.id,
+            code: "UUDDLRLRBAS6",
+            used: false,
+            createdAt: new Date(Date.now())
+          },
+          { transaction: t }
+        ),
+        db.voucher.create(
+          {
+            promoId: promotion2.id,
+            code: "UUDDLRLRBAS7",
+            used: false,
+            createdAt: new Date(Date.now())
+          },
+          { transaction: t }
+        ),
+        db.voucher.create(
+          {
+            promoId: promotion2.id,
+            code: "UUDDLRLRBAS8",
+            used: false,
+            createdAt: new Date(Date.now())
+          },
+          { transaction: t }
+        ),
+        db.voucher.create(
+          {
+            promoId: promotion2.id,
+            code: "UUDDLRLRBAS9",
+            used: false,
+            createdAt: new Date(Date.now())
           },
           { transaction: t }
         )

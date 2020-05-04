@@ -1,39 +1,35 @@
 module.exports = (Sequelize, sequelize) => {
-  const UserAddress = sequelize.define(
-    "User_Address",
+  const Inventory = sequelize.define(
+    "Inventory",
     {
       id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING(50),
         primaryKey: true,
+        allowNull: false
+      },
+      itemId: {
+        type: Sequelize.STRING(50),
+        allowNull: false
+      },
+      variationId: {
+        type: Sequelize.STRING(50),
+        allowNull: false
+      },
+      available: {
+        type: Sequelize.BOOLEAN,
         allowNull: false,
-        autoIncrement: true
+        defaultValue: false
       },
-      userId: {
-        type: Sequelize.STRING(50),
-        allowNull: false
-      },
-      fullName: {
-        type: Sequelize.STRING(50),
-        allowNull: false
-      },
-      phone: {
-        type: Sequelize.STRING(50),
-        allowNull: false
-      },
-      address: {
-        type: Sequelize.TEXT,
-        allowNull: false
-      },
-      isMain: {
+      bought: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false
       }
     },
     {
-      createdAt: "createdAt",
-      updatedAt: "updatedAt"
+      createdAt: false,
+      updatedAt: false
     }
   );
-  return UserAddress;
+  return Inventory;
 };
