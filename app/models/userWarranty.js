@@ -1,34 +1,33 @@
 module.exports = (Sequelize, sequelize) => {
-  const ShopItem = sequelize.define(
-    "Shop_Item",
+  const UserWarranty = sequelize.define(
+    "User_Warranty",
     {
       id: {
         type: Sequelize.STRING(50),
         primaryKey: true,
         allowNull: false
       },
-      shopId: {
+      userId: {
         type: Sequelize.STRING(50),
         allowNull: false
       },
-      itemId: {
+      inventoryId: {
         type: Sequelize.STRING(50),
         allowNull: false
       },
-      variationId: {
-        type: Sequelize.STRING(50),
+      expire_at: {
+        type: Sequelize.DATE,
         allowNull: false
       },
-      available: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
+      expire_mileage: {
+        type: Sequelize.INTEGER,
+        allowNull: false
       }
     },
     {
-      createdAt: false,
+      createdAt: "createdAt",
       updatedAt: false
     }
   );
-  return ShopItem;
+  return UserWarranty;
 };

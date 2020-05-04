@@ -15,40 +15,28 @@ module.exports = (Sequelize, sequelize) => {
         type: Sequelize.STRING(50),
         allowNull: true
       },
-      status: {
+      statusId: {
         type: Sequelize.STRING(50),
         allowNull: false
-      },
-      completedAt: {
-        type: Sequelize.DATE,
-        allowNull: true
       },
       totalPrice: {
         type: Sequelize.DOUBLE,
         allowNull: false
       },
-      paymentMethod: {
+      appliedPromotion: {
         type: Sequelize.STRING(50),
         allowNull: false
       },
-      isPaid: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false
-      },
-      shopId: {
-        type: Sequelize.STRING(50),
+      downPayment: {
+        type: Sequelize.FLOAT,
         allowNull: true
       },
-      delivery_fullname: {
-        type: Sequelize.STRING(50),
+      loadTerm: {
+        type: Sequelize.INTEGER,
         allowNull: true
       },
-      delivery_phone: {
-        type: Sequelize.STRING(50),
-        allowNull: true
-      },
-      delivery_address: {
-        type: Sequelize.TEXT,
+      apr: {
+        type: Sequelize.FLOAT,
         allowNull: true
       }
     },

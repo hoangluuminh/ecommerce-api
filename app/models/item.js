@@ -27,16 +27,6 @@ module.exports = (Sequelize, sequelize) => {
         type: Sequelize.FLOAT,
         allowNull: false
       },
-      rating: {
-        type: Sequelize.INTEGER,
-        defaultValue: 5,
-        allowNull: false
-      },
-      ratingCount: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
-        allowNull: false
-      },
       blog: {
         type: Sequelize.TEXT,
         allowNull: false

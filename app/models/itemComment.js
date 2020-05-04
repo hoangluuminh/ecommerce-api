@@ -16,7 +16,12 @@ module.exports = (Sequelize, sequelize) => {
         allowNull: false
       },
       rating: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
+      comment: {
+        type: Sequelize.TEXT,
+        allowNull: true
       }
     },
     {
