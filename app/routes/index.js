@@ -10,6 +10,12 @@ const mediaRoutes = require("./media.routes");
 const accountUserRoutes = require("./accountUser.routes");
 const accountStaffRoutes = require("./accountStaff.routes");
 
+const itemRoutes = require("./item.routes");
+const attributeRoutes = require("./attribute.routes");
+const typeRoutes = require("./type.routes");
+const brandRoutes = require("./brand.routes");
+const inventoryRoutes = require("./inventory.routes");
+
 // MIDDLEWARES
 router.use(authSetup); // setup for req.authFor
 
@@ -20,5 +26,11 @@ router.use("/media", mediaRoutes);
 
 router.use("/accountUser", accountUserRoutes);
 router.use("/accountStaff", accountStaffRoutes);
+
+router.use("/items", itemRoutes);
+router.use("/attributes", attributeRoutes);
+router.use("/types", typeRoutes);
+router.use("/brands", brandRoutes);
+router.use("/inventories", inventoryRoutes);
 
 module.exports = router;

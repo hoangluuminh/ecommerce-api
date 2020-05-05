@@ -35,6 +35,11 @@ module.exports = (Sequelize, sequelize) => {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false
+      },
+      viewCount: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0
       }
     },
     {

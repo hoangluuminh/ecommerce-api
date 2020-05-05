@@ -186,10 +186,19 @@ async function dataSeed() {
       await Promise.all([
         db.attribute.create(
           {
-            id: "seat",
-            name: "Seating", // 4, 7
+            id: "transmission",
+            name: "Transmission", // Automatic, Manual, Automanual
             valueType: "static",
             placing: 0
+          },
+          { transaction: t }
+        ),
+        db.attribute.create(
+          {
+            id: "fuel",
+            name: "Fuel", // Gasoline, Petrol, Electric, Hybrid
+            valueType: "static",
+            placing: 1
           },
           { transaction: t }
         ),
@@ -198,7 +207,7 @@ async function dataSeed() {
             id: "top-speed",
             name: "Top speed", // 155...
             valueType: "dynamic",
-            placing: 1
+            placing: 2
           },
           { transaction: t }
         ),
@@ -207,7 +216,7 @@ async function dataSeed() {
             id: "top-speed-unit",
             name: "Top speed Unit", // mph, km/h
             valueType: "static",
-            placing: 2
+            placing: 3
           },
           { transaction: t }
         ),
@@ -216,7 +225,7 @@ async function dataSeed() {
             id: "fuel-consume",
             name: "Fuel consumption", // 26 27 28...
             valueType: "dynamic",
-            placing: 3
+            placing: 4
           },
           { transaction: t }
         ),
@@ -225,23 +234,14 @@ async function dataSeed() {
             id: "fuel-consume-unit",
             name: "Fuel consumption Unit", // MPG, l/100km
             valueType: "static",
-            placing: 4
-          },
-          { transaction: t }
-        ),
-        db.attribute.create(
-          {
-            id: "transmission",
-            name: "Transmission", // Automatic, Manual, Automanual
-            valueType: "static",
             placing: 5
           },
           { transaction: t }
         ),
         db.attribute.create(
           {
-            id: "fuel",
-            name: "Fuel", // Gasoline, Petrol, Electric, Hybrid
+            id: "seat",
+            name: "Seating", // 4, 7
             valueType: "static",
             placing: 6
           },
@@ -392,185 +392,7 @@ async function dataSeed() {
 
       /* USER-GENERATED */
 
-      // item
-      await db.item.create(
-        {
-          id: "bmw-unknownicar-2018-01",
-          name: "BMW Unknownicar",
-          typeId: "coupe",
-          brandId: "bmw",
-          year: "2018",
-          price: 10000,
-          blog: "Car description",
-          hidden: false
-        },
-        { transaction: t }
-      );
-      await Promise.all([
-        db.itemAttribute.create(
-          {
-            attributeId: "seat",
-            itemId: "bmw-unknownicar-2018-01",
-            value: "2", // 4, 7
-            rating: 5
-          },
-          { transaction: t }
-        ),
-        db.itemAttribute.create(
-          {
-            attributeId: "top-speed",
-            itemId: "bmw-unknownicar-2018-01",
-            value: "155", // 155...
-            rating: 5
-          },
-          { transaction: t }
-        ),
-        db.itemAttribute.create(
-          {
-            attributeId: "top-speed-unit",
-            itemId: "bmw-unknownicar-2018-01",
-            value: "mph", // mph, km/h
-            rating: 5
-          },
-          { transaction: t }
-        ),
-        db.itemAttribute.create(
-          {
-            attributeId: "fuel-consume",
-            itemId: "bmw-unknownicar-2018-01",
-            value: "28", // 26 27 28...
-            rating: 5
-          },
-          { transaction: t }
-        ),
-        db.itemAttribute.create(
-          {
-            attributeId: "fuel-consume-unit",
-            itemId: "bmw-unknownicar-2018-01",
-            value: "MPG", // MPG, l/100km
-            rating: 5
-          },
-          { transaction: t }
-        ),
-        db.itemAttribute.create(
-          {
-            attributeId: "transmission",
-            itemId: "bmw-unknownicar-2018-01",
-            value: "Manual", // Automatic, Manual, Automanual
-            rating: 5
-          },
-          { transaction: t }
-        ),
-        db.itemAttribute.create(
-          {
-            attributeId: "fuel",
-            itemId: "bmw-unknownicar-2018-01",
-            value: "Petrol", // Gasoline, Petrol, Electric, Hybrid
-            rating: 5
-          },
-          { transaction: t }
-        ),
-        db.itemAttribute.create(
-          {
-            attributeId: "drivetrain",
-            itemId: "bmw-unknownicar-2018-01",
-            value: "AWD", // FWD, RWD, 4WD, 4x2, 4x4, Other
-            rating: 5
-          },
-          { transaction: t }
-        ),
-        db.itemAttribute.create(
-          {
-            attributeId: "engine",
-            itemId: "bmw-unknownicar-2018-01",
-            value: "TwinPower Turbo", // TwinPower Turbo, Biturbo
-            rating: 5
-          },
-          { transaction: t }
-        ),
-        db.itemAttribute.create(
-          {
-            attributeId: "weight",
-            itemId: "bmw-unknownicar-2018-01",
-            value: "1000", // 100 1000 ,...
-            rating: 5
-          },
-          { transaction: t }
-        ),
-        db.itemAttribute.create(
-          {
-            attributeId: "weight-unit",
-            itemId: "bmw-unknownicar-2018-01",
-            value: "lbs", // lbs, kg
-            rating: 5
-          },
-          { transaction: t }
-        ),
-        db.itemAttribute.create(
-          {
-            attributeId: "fuel-capacity",
-            itemId: "bmw-unknownicar-2018-01",
-            value: "100", // 100 1000 ,...
-            rating: 5
-          },
-          { transaction: t }
-        ),
-        db.itemAttribute.create(
-          {
-            attributeId: "fuel-capacity-unit",
-            itemId: "bmw-unknownicar-2018-01",
-            value: "gallon", // gallon, litre
-            rating: 5
-          },
-          { transaction: t }
-        )
-      ]);
-      const variationRedId = generateId();
-      const variationNightBlueId = generateId();
-      await Promise.all([
-        db.itemVariation.create(
-          {
-            id: variationRedId,
-            itemId: "bmw-unknownicar-2018-01",
-            name: "Red",
-            colors: "FF0000",
-            placing: 0
-          },
-          { transaction: t }
-        ),
-        db.itemVariation.create(
-          {
-            id: variationNightBlueId,
-            itemId: "bmw-unknownicar-2018-01",
-            name: "Night Blue",
-            colors: "0057FF,303030",
-            placing: 1
-          },
-          { transaction: t }
-        )
-      ]);
-      await Promise.all([
-        db.inventory.create(
-          {
-            id: "1HGBH41JXMN000001",
-            itemId: "bmw-unknownicar-2018-01",
-            variationId: variationRedId,
-            available: true,
-            bought: false
-          },
-          { transaction: t }
-        ),
-        db.inventory.create(
-          {
-            id: "1HGBH41JXMN000002",
-            itemId: "bmw-unknownicar-2018-01",
-            variationId: variationNightBlueId,
-            available: true,
-            bought: true
-          },
-          { transaction: t }
-        )
-      ]);
+      // media
       await db.media.create(
         { url: "0cQhD0me2_unknownicar.png", description: "" },
         { transaction: t }
@@ -587,54 +409,236 @@ async function dataSeed() {
         { url: "0cQhD0me5_unknownicar4.png", description: "" },
         { transaction: t }
       );
-      await Promise.all([
-        db.itemImg.create(
+
+      // item
+      for (let i = 1; i <= 30; i += 1) {
+        await db.item.create(
           {
-            itemId: "bmw-unknownicar-2018-01",
-            mediaId: 1,
-            placing: 0
+            id: `bmw-unknownicar-2018-${i}`,
+            name: `BMW Unknownicar (${i})`,
+            typeId: "coupe",
+            brandId: "bmw",
+            year: "2018",
+            price: 10000,
+            blog: "Car description",
+            hidden: false
           },
           { transaction: t }
-        ),
-        db.itemImg.create(
+        );
+        await Promise.all([
+          db.itemAttribute.create(
+            {
+              attributeId: "seat",
+              itemId: `bmw-unknownicar-2018-${i}`,
+              value: "2", // 4, 7
+              rating: 5
+            },
+            { transaction: t }
+          ),
+          db.itemAttribute.create(
+            {
+              attributeId: "top-speed",
+              itemId: `bmw-unknownicar-2018-${i}`,
+              value: "155", // 155...
+              rating: 5
+            },
+            { transaction: t }
+          ),
+          db.itemAttribute.create(
+            {
+              attributeId: "top-speed-unit",
+              itemId: `bmw-unknownicar-2018-${i}`,
+              value: "mph", // mph, km/h
+              rating: 5
+            },
+            { transaction: t }
+          ),
+          db.itemAttribute.create(
+            {
+              attributeId: "fuel-consume",
+              itemId: `bmw-unknownicar-2018-${i}`,
+              value: "28", // 26 27 28...
+              rating: 5
+            },
+            { transaction: t }
+          ),
+          db.itemAttribute.create(
+            {
+              attributeId: "fuel-consume-unit",
+              itemId: `bmw-unknownicar-2018-${i}`,
+              value: "MPG", // MPG, l/100km
+              rating: 5
+            },
+            { transaction: t }
+          ),
+          db.itemAttribute.create(
+            {
+              attributeId: "transmission",
+              itemId: `bmw-unknownicar-2018-${i}`,
+              value: "Manual", // Automatic, Manual, Automanual
+              rating: 5
+            },
+            { transaction: t }
+          ),
+          db.itemAttribute.create(
+            {
+              attributeId: "fuel",
+              itemId: `bmw-unknownicar-2018-${i}`,
+              value: "Petrol", // Gasoline, Petrol, Electric, Hybrid
+              rating: 5
+            },
+            { transaction: t }
+          ),
+          db.itemAttribute.create(
+            {
+              attributeId: "drivetrain",
+              itemId: `bmw-unknownicar-2018-${i}`,
+              value: "AWD", // FWD, RWD, 4WD, 4x2, 4x4, Other
+              rating: 5
+            },
+            { transaction: t }
+          ),
+          db.itemAttribute.create(
+            {
+              attributeId: "engine",
+              itemId: `bmw-unknownicar-2018-${i}`,
+              value: "TwinPower Turbo", // TwinPower Turbo, Biturbo
+              rating: 5
+            },
+            { transaction: t }
+          ),
+          db.itemAttribute.create(
+            {
+              attributeId: "weight",
+              itemId: `bmw-unknownicar-2018-${i}`,
+              value: "1000", // 100 1000 ,...
+              rating: 5
+            },
+            { transaction: t }
+          ),
+          db.itemAttribute.create(
+            {
+              attributeId: "weight-unit",
+              itemId: `bmw-unknownicar-2018-${i}`,
+              value: "lbs", // lbs, kg
+              rating: 5
+            },
+            { transaction: t }
+          ),
+          db.itemAttribute.create(
+            {
+              attributeId: "fuel-capacity",
+              itemId: `bmw-unknownicar-2018-${i}`,
+              value: "100", // 100 1000 ,...
+              rating: 5
+            },
+            { transaction: t }
+          ),
+          db.itemAttribute.create(
+            {
+              attributeId: "fuel-capacity-unit",
+              itemId: `bmw-unknownicar-2018-${i}`,
+              value: "gallon", // gallon, litre
+              rating: 5
+            },
+            { transaction: t }
+          )
+        ]);
+        const variationRedId = generateId();
+        const variationNightBlueId = generateId();
+        await Promise.all([
+          db.itemVariation.create(
+            {
+              id: variationRedId,
+              itemId: `bmw-unknownicar-2018-${i}`,
+              name: "Red",
+              colors: "FF0000",
+              placing: 0
+            },
+            { transaction: t }
+          ),
+          db.itemVariation.create(
+            {
+              id: variationNightBlueId,
+              itemId: `bmw-unknownicar-2018-${i}`,
+              name: "Night Blue",
+              colors: "0057FF,303030",
+              placing: 1
+            },
+            { transaction: t }
+          )
+        ]);
+        await Promise.all([
+          db.inventory.create(
+            {
+              id: `1HGBH41JXMN00001${i}`,
+              itemId: `bmw-unknownicar-2018-${i}`,
+              variationId: variationRedId,
+              available: true,
+              bought: false
+            },
+            { transaction: t }
+          ),
+          db.inventory.create(
+            {
+              id: `1HGBH41JXMN00002${i}`,
+              itemId: `bmw-unknownicar-2018-${i}`,
+              variationId: variationNightBlueId,
+              available: true,
+              bought: true
+            },
+            { transaction: t }
+          )
+        ]);
+        await Promise.all([
+          db.itemImg.create(
+            {
+              itemId: `bmw-unknownicar-2018-${i}`,
+              mediaId: 1,
+              placing: 0
+            },
+            { transaction: t }
+          ),
+          db.itemImg.create(
+            {
+              itemId: `bmw-unknownicar-2018-${i}`,
+              mediaId: 2,
+              placing: 1
+            },
+            { transaction: t }
+          ),
+          db.itemImg.create(
+            {
+              itemId: `bmw-unknownicar-2018-${i}`,
+              mediaId: 3,
+              placing: 2
+            },
+            { transaction: t }
+          ),
+          db.itemImg.create(
+            {
+              itemId: `bmw-unknownicar-2018-${i}`,
+              mediaId: 4,
+              placing: 3
+            },
+            { transaction: t }
+          )
+        ]);
+        await db.userFavItem.create(
+          { itemId: `bmw-unknownicar-2018-${i}`, userId: thatUserId, price: 10000 },
+          { transaction: t }
+        );
+        await db.itemComment.create(
           {
-            itemId: "bmw-unknownicar-2018-01",
-            mediaId: 2,
-            placing: 1
+            id: generateId(),
+            itemId: `bmw-unknownicar-2018-${i}`,
+            userId: thatUserId,
+            rating: 5,
+            comment: "This car is so cool, it puts Elon Musk to shame!!!"
           },
           { transaction: t }
-        ),
-        db.itemImg.create(
-          {
-            itemId: "bmw-unknownicar-2018-01",
-            mediaId: 3,
-            placing: 2
-          },
-          { transaction: t }
-        ),
-        db.itemImg.create(
-          {
-            itemId: "bmw-unknownicar-2018-01",
-            mediaId: 4,
-            placing: 3
-          },
-          { transaction: t }
-        )
-      ]);
-      await db.userFavItem.create(
-        { itemId: "bmw-unknownicar-2018-01", userId: thatUserId, price: 10000 },
-        { transaction: t }
-      );
-      await db.itemComment.create(
-        {
-          id: generateId(),
-          itemId: "bmw-unknownicar-2018-01",
-          userId: thatUserId,
-          rating: 5,
-          comment: "This car is so cool, it puts Elon Musk to shame!!!"
-        },
-        { transaction: t }
-      );
+        );
+      }
 
       // promotion, promotionItem, voucher
       const promotion1 = await db.promotion.create(
@@ -662,11 +666,11 @@ async function dataSeed() {
         { transaction: t }
       );
       await db.promotionItem.create(
-        { promoId: promotion1.id, itemId: "bmw-unknownicar-2018-01" },
+        { promoId: promotion1.id, itemId: "bmw-unknownicar-2018-1" },
         { transaction: t }
       );
       await db.promotionItem.create(
-        { promoId: promotion2.id, itemId: "bmw-unknownicar-2018-01" },
+        { promoId: promotion2.id, itemId: "bmw-unknownicar-2018-1" },
         { transaction: t }
       );
       await Promise.all([
