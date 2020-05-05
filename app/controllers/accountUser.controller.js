@@ -7,7 +7,7 @@ const HttpError = require("../models/classes/http-error");
 
 const accountUserService = require("../services/accountUser.service");
 
-const controllerName = "[accountStaff.controller]";
+const controllerName = "[accountUser.controller]";
 
 // GET: Get users info
 exports.getAccountUsers = async (req, res, next) => {

@@ -25,7 +25,7 @@ module.exports = (Sequelize, sequelize) => {
       }
     },
     {
-      createdAt: false,
+      createdAt: "createdAt",
       updatedAt: false
     }
   );

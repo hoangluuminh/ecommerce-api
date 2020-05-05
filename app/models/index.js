@@ -106,8 +106,8 @@ db.accountUser.hasMany(db.supportTicket, {
 db.accountUser.hasMany(db.userWarranty, { as: "Warranties", foreignKey: "userId" });
 
 db.attribute.hasMany(db.itemAttribute, {
-  as: "ItemAttributes",
-  foreignKey: "attributeId"
+as: "ItemAttributes",
+foreignKey: "attributeId"
 });
 
 db.brand.hasMany(db.item, { as: "Items", foreignKey: "brandId" });
@@ -115,7 +115,11 @@ db.brand.hasMany(db.item, { as: "Items", foreignKey: "brandId" });
 db.item.belongsTo(db.type, { as: "Type", foreignKey: "typeId" });
 db.item.belongsTo(db.brand, { as: "Brand", foreignKey: "brandId" });
 db.item.hasMany(db.itemImg, { as: "Imgs", foreignKey: "itemId", onDelete: "CASCADE" });
-db.item.hasMany(db.itemAttribute, { as: "Attributes", foreignKey: "itemId", onDelete: "CASCADE" });
+db.item.hasMany(db.itemAttribute, {
+as: "ItemAttributes",
+foreignKey: "itemId",
+onDelete: "CASCADE"
+});
 db.item.hasMany(db.inventory, { as: "Inventory", foreignKey: "itemId", onDelete: "CASCADE" });
 db.item.hasMany(db.itemVariation, { as: "Variations", foreignKey: "itemId", onDelete: "CASCADE" });
 db.item.hasMany(db.userFavItem, { as: "UserFavs", foreignKey: "itemId", onDelete: "CASCADE" });
@@ -208,5 +212,18 @@ db.userWarranty.hasMany(db.warrantyService, {
 });
 
 db.voucher.belongsTo(db.promotion, { as: "Promotion", foreignKey: "promoId" });
+
+// MANY TO MANY
+
+db.item.belongsToMany(db.attribute, {
+  as: "Attributes",
+  through: db.itemAttribute,
+  foreignKey: "itemId"
+});
+db.attribute.belongsToMany(db.item, {
+  as: "Items",
+  through: db.itemAttribute,
+  foreignKey: "attributeId"
+});
 
 module.exports = db;

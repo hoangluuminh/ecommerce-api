@@ -13,7 +13,13 @@ exports.ERRORS = {
     AUTH_TOKEN: ["InvalidTokenError", "Invalid refresh token", 403],
     MEDIA_TYPE: ["InvalidFileTypeError", "Invalid file type", 400],
     MEDIA_URL: ["InvalidMediaUrlError", "File with specified name cannot be found", 404],
-    // ITEM: ["InvalidItemError", "Specified item cannot be found", 400],
+    //
+    ITEM: ["InvalidItemError", "Specified item cannot be found", 400],
+    ATTRIBUTE: ["InvalidAttributeError", "Specified attribute cannot be found", 400],
+    TYPE: ["InvalidTypeError", "Specified type cannot be found", 400],
+    BRAND: ["InvalidBrandError", "Specified brand cannot be found", 400],
+    INVENTORY: ["InvalidInventoryError", "Specified inventory item cannot be found", 400],
+    ITEMVARIATION: ["InvalidItemVariationError", "Specified item variation cannot be found", 400],
     // ITEMIMG: ["InvalidItemImgError", "Cannot find image", 400],
     // ITEMIMGS: ["InvalidItemImgsError", "Cannot find images", 400],
     // BRAND: ["InvalidBrandError", "Specified brand cannot be found", 400],
@@ -26,14 +32,19 @@ exports.ERRORS = {
     STAFF_ROLE: ["InvalidRoleError", "Specified role does not exist", 400]
   },
   DUPLICATE: {
-    // ITEM: ["DuplicateItemError", "Item already exists", 400],
+    INVENTORY: ["DuplicateInventoryError", "Found duplication in identifiers list", 400]
     // ITEMIMGURL: ["DuplicateItemImgURLError", "Image with specified URL already exists", 400],
     // BRAND: ["DuplicateBrandError", "Brand with specified id already exists", 400],
     // CATEGORY: ["DuplicateCategoryError", "Category with specified id already exists", 400]
   },
   UNIQUE: {
     USER_USERNAME: ["UniqueUserUsernameError", "Username already exists", 400],
-    USER_EMAIL: ["UniqueUserEmailError", "Email already exists", 400]
+    USER_EMAIL: ["UniqueUserEmailError", "Email already exists", 400],
+    ITEM: ["UniqueItemError", "Item already exists", 400],
+    TYPE: ["UniqueTypeError", "Type already exists", 400],
+    BRAND: ["UniqueBrandError", "Brand already exists", 400],
+    ATTRIBUTE: ["DuplicateAttributeError", "Attribute already exists", 400],
+    INVENTORY: ["UniqueInventoryError", "One of the provided indentifiers already exists", 400]
   },
   AUTH: {
     UNAUTHENTICATED: ["AuthUnauthenticatedError", "Unauthenticated", 401],
@@ -45,7 +56,23 @@ exports.ERRORS = {
   },
   MISC: {
     ROUTE: ["RouteError", "Could not find this route.", 404],
-    MEDIA_FILESIZE: ["ExceedingFileSizeError", "Maximum size exceeded.", 400]
+    MEDIA_FILESIZE: ["ExceedingFileSizeError", "Maximum size exceeded.", 400],
+    ITEM_VARIATIONMISSING: [
+      "ItemVariationMissingError",
+      "Existing variations are missing from the provided variation list",
+      400
+    ],
+    INVENTORY_BOUGHT: ["InventoryBoughtError", "Bought inventory item cannot be updated.", 400],
+    INVENTORY_INCORRECTITEM: [
+      "InventoryIncorrectItemError",
+      "Inventory item's variation must belongs to its item.",
+      400
+    ],
+    ATTRIBUTE_DYNAMIC: [
+      "AttributeDynamicValueError",
+      "Value for dynamic attribute must be a number",
+      400
+    ]
     // BRANDS_PARENTING: ["BrandsParentingError", "The brands belong to different parents", 400],
     // BRANDS_UNDELETABLEPARENT: ["UndeletableParentBrandError", "You cannot delete parent brand", 400]
   },

@@ -27,8 +27,8 @@ module.exports = (Sequelize, sequelize) => {
       }
     },
     {
-      createdAt: false,
-      updatedAt: false
+      createdAt: "createdAt",
+      updatedAt: "updatedAt"
     }
   );
   return Inventory;
