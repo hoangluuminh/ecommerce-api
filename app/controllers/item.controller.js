@@ -30,7 +30,8 @@ exports.getItems = async (req, res, next) => {
     brand,
     year,
     price,
-    variationName
+    variationName,
+    withHidden
   } = req.query;
   const query = req.query.query || "";
   const attributes = {};
@@ -52,7 +53,8 @@ exports.getItems = async (req, res, next) => {
       year,
       price,
       variationName,
-      attributes
+      attributes,
+      withHidden
     );
     return res.json({
       items,
@@ -75,10 +77,10 @@ exports.getItem = async (req, res, next) => {
   }
   // Declarations
   const { itemId } = req.params;
-  const { silent } = req.query;
+  const { silent, keepAttr } = req.query;
   // Executions
   try {
-    const item = await itemService.getItem(itemId, silent);
+    const item = await itemService.getItem(itemId, silent, keepAttr);
     return res.json({ item });
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);

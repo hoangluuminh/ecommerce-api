@@ -25,9 +25,6 @@ module.exports = (Sequelize, sequelize) => {
       },
       offPercent: {
         type: Sequelize.INTEGER
-      },
-      autoApplied: {
-        type: Sequelize.BOOLEAN
       }
     },
     {

@@ -20,7 +20,9 @@ const {
   promotionItem: PromotionItem,
   promotion: Promotion,
   media: Media,
-  itemComment: ItemComment
+  itemComment: ItemComment,
+  accountUser: AccountUser,
+  account: Account
 } = db;
 
 const HttpError = require("../models/classes/http-error");
@@ -40,7 +42,8 @@ exports.getItems = async (
   year,
   price,
   variationName,
-  attributes
+  attributes,
+  withHidden
 ) => {
   // Declarations
   const [includes] = await getItemPreparation(attributes); // eslint-disable-line
@@ -113,7 +116,7 @@ exports.getItems = async (
         }
       },
       // hidden
-      { hidden: false },
+      { hidden: !withHidden ? false : db.sequelize.literal("1=1") },
       // type, brand
       { typeId: type || db.sequelize.literal("1=1") },
       { brandId: brand || db.sequelize.literal("1=1") },
@@ -154,7 +157,7 @@ exports.getItems = async (
 };
 
 // GET: Product detail
-exports.getItem = async (itemId, silent) => {
+exports.getItem = async (itemId, silent, keepAttr) => {
   // Declarations
   const [includes] = await getItemPreparation(); // eslint-disable-line
   const includeOrders = [
@@ -169,7 +172,20 @@ exports.getItem = async (itemId, silent) => {
       ...includes,
       {
         model: ItemComment,
-        as: "Comments"
+        as: "Comments",
+        include: [
+          {
+            model: AccountUser,
+            as: "User",
+            include: [
+              {
+                model: Account,
+                as: "Account",
+                attributes: ["username", "email"]
+              }
+            ]
+          }
+        ]
       }
     ],
     order: includeOrders,
@@ -180,7 +196,7 @@ exports.getItem = async (itemId, silent) => {
   }
 
   /* POST PROCESSING */
-  const item = getItemFinalization(seqItem); // eslint-disable-line
+  const item = getItemFinalization(seqItem, null, null, keepAttr); // eslint-disable-line
   item.dataValues.rating = _.sum(item.Comments.map(c => c.rating)) / item.Comments.length;
 
   // Additional: one up view count
@@ -354,7 +370,7 @@ exports.updateItem = async (
   // Executions
   db.sequelize.transaction(async t => {
     await Item.update(
-      { name, type, brand, year, price, blog, hidden },
+      { name, typeId: type, brandId: brand, year, price, blog, hidden },
       { where: { id } },
       { transaction: t }
     );
@@ -383,7 +399,7 @@ exports.updateItem = async (
     for (let i = 0; i < oldVariations.length; i += 1) {
       // eslint-disable-next-line
       await ItemVariation.update(
-        { name: variations[i].name, colors: variations[i].name },
+        { name: variations[i].name, colors: variations[i].colors },
         { where: { itemId: id, placing: i } },
         { transaction: t }
       );
@@ -519,7 +535,7 @@ const getItemPreparation = async attributes => {
   return [includes];
 };
 
-const getItemFinalization = (item, attributes, variationName) => {
+const getItemFinalization = (item, attributes, variationName, keepAttr) => {
   // attributes filter
   if (attributes && Object.keys(attributes).length > 0) {
     if (Object.keys(attributes).length !== item.ItemAttributes.length) {
@@ -552,7 +568,6 @@ const getItemFinalization = (item, attributes, variationName) => {
         new Date(promoItemPromo.timeEnd)
       ];
       if (
-        promoItemPromo.autoApplied &&
         moment()
           .range(timeStart, timeEnd)
           .contains(new Date(Date.now()))
@@ -567,16 +582,18 @@ const getItemFinalization = (item, attributes, variationName) => {
   // Remove itemAttributes (only used for comparing, filtering)
   newItem.dataValues.ItemAttributes = null;
   // Merge attribute and its unit
-  const oldAttributes = item.Attributes;
-  oldAttributes.forEach(oAttr => {
-    const updatingAttrUnit = oldAttributes.find(a => a.id === `${oAttr.id}-unit`);
-    if (updatingAttrUnit) {
-      const updatingItemAttr = newItem.Attributes.find(a => a.id === oAttr.id).Item_Attribute;
-      const updatingItemAttrUnit = updatingAttrUnit.Item_Attribute;
-      updatingItemAttr.dataValues.value = `${updatingItemAttr.value} ${updatingItemAttrUnit.value}`;
-      _.remove(newItem.Attributes, { id: updatingAttrUnit.id });
-    }
-  });
+  if (!keepAttr) {
+    const oldAttributes = item.Attributes;
+    oldAttributes.forEach(oAttr => {
+      const updatingAttrUnit = oldAttributes.find(a => a.id === `${oAttr.id}-unit`);
+      if (updatingAttrUnit) {
+        const updatingItemAttr = newItem.Attributes.find(a => a.id === oAttr.id).Item_Attribute;
+        const updatingItemAttrUnit = updatingAttrUnit.Item_Attribute;
+        updatingItemAttr.dataValues.value = `${updatingItemAttr.value} ${updatingItemAttrUnit.value}`;
+        _.remove(newItem.Attributes, { id: updatingAttrUnit.id });
+      }
+    });
+  }
   // inventorySizes
   newItem.dataValues.inventorySize = item.Inventory.length;
   newItem.dataValues.Inventory = null;
