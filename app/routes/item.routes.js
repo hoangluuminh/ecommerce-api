@@ -83,7 +83,12 @@ router.get(
     query("brand").optional(),
     query("year").optional(),
     query("price").optional(),
-    query("variationName").optional()
+    query("variationName").optional(),
+    // Additional
+    query("withHidden")
+      .optional()
+      .isBoolean()
+      .withMessage("Must be boolean.")
     // query("attributes.*").optional()
   ],
   itemController.getItems
@@ -100,6 +105,10 @@ router.get(
   "/:itemId",
   [
     query("silent")
+      .optional()
+      .isBoolean()
+      .withMessage("Must be boolean."),
+    query("keepAttr")
       .optional()
       .isBoolean()
       .withMessage("Must be boolean.")

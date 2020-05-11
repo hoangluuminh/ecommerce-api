@@ -96,7 +96,8 @@ async function dataSeed() {
             firstName: "Hoàng",
             phone: "09080909008",
             gender: "m",
-            birthday: new Date()
+            birthday: new Date(),
+            address: "100-102 Forever Land"
           },
           { transaction: t }
         )
@@ -648,20 +649,7 @@ async function dataSeed() {
           timeStart: new Date(),
           timeEnd: new Date("2030"),
           description: "Selected products are sale-off forever!",
-          offPercent: 5,
-          autoApplied: true
-        },
-        { transaction: t }
-      );
-      const promotion2 = await db.promotion.create(
-        {
-          id: generateId(),
-          name: "Secret Voucher",
-          timeStart: new Date(),
-          timeEnd: new Date("2030"),
-          description: "Get 10% off with this secret voucher",
-          offPercent: 10,
-          autoApplied: false
+          offPercent: 5
         },
         { transaction: t }
       );
@@ -669,102 +657,6 @@ async function dataSeed() {
         { promoId: promotion1.id, itemId: "bmw-unknownicar-2018-1" },
         { transaction: t }
       );
-      await db.promotionItem.create(
-        { promoId: promotion2.id, itemId: "bmw-unknownicar-2018-1" },
-        { transaction: t }
-      );
-      await Promise.all([
-        db.voucher.create(
-          {
-            promoId: promotion2.id,
-            code: "UUDDLRLRBAS0",
-            used: false,
-            createdAt: new Date(Date.now())
-          },
-          { transaction: t }
-        ),
-        db.voucher.create(
-          {
-            promoId: promotion2.id,
-            code: "UUDDLRLRBAS1",
-            used: false,
-            createdAt: new Date(Date.now())
-          },
-          { transaction: t }
-        ),
-        db.voucher.create(
-          {
-            promoId: promotion2.id,
-            code: "UUDDLRLRBAS2",
-            used: false,
-            createdAt: new Date(Date.now())
-          },
-          { transaction: t }
-        ),
-        db.voucher.create(
-          {
-            promoId: promotion2.id,
-            code: "UUDDLRLRBAS3",
-            used: false,
-            createdAt: new Date(Date.now())
-          },
-          { transaction: t }
-        ),
-        db.voucher.create(
-          {
-            promoId: promotion2.id,
-            code: "UUDDLRLRBAS4",
-            used: false,
-            createdAt: new Date(Date.now())
-          },
-          { transaction: t }
-        ),
-        db.voucher.create(
-          {
-            promoId: promotion2.id,
-            code: "UUDDLRLRBAS5",
-            used: false,
-            createdAt: new Date(Date.now())
-          },
-          { transaction: t }
-        ),
-        db.voucher.create(
-          {
-            promoId: promotion2.id,
-            code: "UUDDLRLRBAS6",
-            used: false,
-            createdAt: new Date(Date.now())
-          },
-          { transaction: t }
-        ),
-        db.voucher.create(
-          {
-            promoId: promotion2.id,
-            code: "UUDDLRLRBAS7",
-            used: false,
-            createdAt: new Date(Date.now())
-          },
-          { transaction: t }
-        ),
-        db.voucher.create(
-          {
-            promoId: promotion2.id,
-            code: "UUDDLRLRBAS8",
-            used: false,
-            createdAt: new Date(Date.now())
-          },
-          { transaction: t }
-        ),
-        db.voucher.create(
-          {
-            promoId: promotion2.id,
-            code: "UUDDLRLRBAS9",
-            used: false,
-            createdAt: new Date(Date.now())
-          },
-          { transaction: t }
-        )
-      ]);
     });
   } catch (e) {
     console.log(e);

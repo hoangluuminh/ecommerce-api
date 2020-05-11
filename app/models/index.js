@@ -28,11 +28,11 @@ const type = require("./type");
 const userFavItem = require("./userFavItem");
 const userInfo = require("./userInfo");
 const userWarranty = require("./userWarranty");
-const voucher = require("./voucher");
 const warrantyService = require("./warrantyService");
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
-  host: dbConfig.host,
+  host: dbConfig.HOST,
+  port: dbConfig.PORT,
   dialect: dbConfig.dialect,
   pool: { ...dbConfig.pool },
   logging: dbConfig.logging
@@ -69,7 +69,6 @@ const db = {
   userFavItem: userFavItem(Sequelize, sequelize),
   userInfo: userInfo(Sequelize, sequelize),
   userWarranty: userWarranty(Sequelize, sequelize),
-  voucher: voucher(Sequelize, sequelize),
   warrantyService: warrantyService(Sequelize, sequelize)
 };
 
@@ -176,7 +175,6 @@ db.promotion.hasMany(db.promotionItem, {
   foreignKey: "promoId",
   onDelete: "CASCADE"
 });
-db.promotion.hasMany(db.voucher, { as: "Vouchers", foreignKey: "promoId", onDelete: "CASCADE" });
 
 db.promotionItem.belongsTo(db.promotion, { as: "Promotion", foreignKey: "promoId" });
 db.promotionItem.belongsTo(db.item, { as: "Item", foreignKey: "itemId" });
@@ -210,8 +208,6 @@ db.userWarranty.hasMany(db.warrantyService, {
   as: "WarrantyServices",
   foreignKey: "userWarrantyId"
 });
-
-db.voucher.belongsTo(db.promotion, { as: "Promotion", foreignKey: "promoId" });
 
 // MANY TO MANY
 

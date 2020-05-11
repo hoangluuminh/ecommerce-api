@@ -12,6 +12,14 @@ module.exports = (Sequelize, sequelize) => {
         type: Sequelize.STRING(50),
         allowNull: false
       },
+      item_id: {
+        type: Sequelize.STRING(50),
+        allowNull: false
+      },
+      item_variationId: {
+        type: Sequelize.STRING(50),
+        allowNull: false
+      },
       item_name: {
         type: Sequelize.STRING(50),
         allowNull: false
