@@ -46,7 +46,9 @@ exports.getInventories = async (query, page, size, sort, sortDesc, itemId) => {
         [Op.or]: {
           id: { [Op.substring]: query },
           "$Item.name$": { [Op.substring]: query },
-          "$Variation.name$": { [Op.substring]: query }
+          "$Item.id$": { [Op.substring]: query },
+          "$Variation.name$": { [Op.substring]: query },
+          "$Variation.id$": { [Op.substring]: query }
         }
       },
       // itemId

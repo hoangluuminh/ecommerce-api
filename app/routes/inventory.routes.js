@@ -10,7 +10,7 @@ const inventoryController = require("../controllers/inventory.controller");
 router.get(
   "/",
   isAuth,
-  hasRole(["manager"]),
+  hasRole(["manager", "merchandiser"]),
   [
     query("query").optional(),
     query("page")

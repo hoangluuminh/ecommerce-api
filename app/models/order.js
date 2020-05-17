@@ -25,19 +25,35 @@ module.exports = (Sequelize, sequelize) => {
       },
       appliedPromotion: {
         type: Sequelize.STRING(50),
-        allowNull: false
+        allowNull: true
       },
       downPayment: {
         type: Sequelize.FLOAT,
         allowNull: true
       },
-      loadTerm: {
+      loanTerm: {
         type: Sequelize.INTEGER,
         allowNull: true
       },
       apr: {
         type: Sequelize.FLOAT,
         allowNull: true
+      },
+      payee_lastName: {
+        type: Sequelize.STRING(50),
+        allowNull: false
+      },
+      payee_firstName: {
+        type: Sequelize.STRING(50),
+        allowNull: false
+      },
+      payee_email: {
+        type: Sequelize.STRING(50),
+        allowNull: false
+      },
+      payee_phone: {
+        type: Sequelize.STRING(50),
+        allowNull: false
       }
     },
     {

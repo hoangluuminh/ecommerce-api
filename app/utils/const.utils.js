@@ -21,12 +21,15 @@ exports.ERRORS = {
     INVENTORY: ["InvalidInventoryError", "Specified inventory item cannot be found", 400],
     ITEMVARIATION: ["InvalidItemVariationError", "Specified item variation cannot be found", 400],
     SHOP: ["InvalidShopError", "Specified shop cannot be found", 400],
+    ORDER: ["InvalidOrderError", "Specified order cannot be found", 400],
+    ORDERSTATUS: ["InvalidOrderStatusError", "Specified order status cannot be found", 400],
     // ITEMIMG: ["InvalidItemImgError", "Cannot find image", 400],
     // ITEMIMGS: ["InvalidItemImgsError", "Cannot find images", 400],
     // BRAND: ["InvalidBrandError", "Specified brand cannot be found", 400],
     // BRANDS: ["InvalidBrandsError", "One of the specified brands cannot be found", 400],
     // BRAND_PARENT: ["InvalidParentBrandError", "Specified parent brand cannot be found", 400],
     // CATEGORY: ["InvalidCategoryError", "Specified category cannot be found", 400],
+    //
     ACCOUNTUSER: ["InvalidAccountUserError", "Specified user cannot be found", 400],
     ACCOUNTSTAFF: ["InvalidAccountStaffError", "Specified staff cannot be found", 400],
     OLDPASSWORD: ["InvalidOldPasswordError", "Incorrect password for current account", 400],
@@ -69,9 +72,40 @@ exports.ERRORS = {
       "Inventory item's variation must belongs to its item.",
       400
     ],
+    INVENTORY_INCORRECTVARIATION: [
+      "InventoryIncorrectVariationError",
+      "Specified Inventory item does not belong to its variation.",
+      400
+    ],
+    INVENTORY_UNAVAILABLE: [
+      "InventoryUnavailableError",
+      "This inventory item is not available.",
+      400
+    ],
     ATTRIBUTE_DYNAMIC: [
       "AttributeDynamicValueError",
       "Value for dynamic attribute must be a number",
+      400
+    ],
+    ORDER_CARTVARIATION: [
+      "OrderIncorrectVariationError",
+      "One of the specified variations does not belong to its item.",
+      400
+    ],
+    ORDER_QUANTITY: [
+      "OrderQuantityError",
+      "Item with specified variation is currently out of stock.", // Since Autogo only allows quantity=1
+      400
+    ],
+    ORDER_FORBIDDEN: ["OrderForbiddenError", "This action cannot be performed on this order.", 400],
+    ORDER_EXCEEDDOWNPAYMENT: [
+      "OrderExceedDownpaymentError",
+      "Downpayment must be below 85% of Total Payment.",
+      400
+    ],
+    ORDERDETAIL_MISMATCH: [
+      "OrderDetailMismatchError",
+      "Supplied Order details and saved Order details have Variations mismatch.",
       400
     ]
     // BRANDS_PARENTING: ["BrandsParentingError", "The brands belong to different parents", 400],
@@ -88,6 +122,11 @@ exports.ERRORS = {
       LOGIN: ["UnknownLoginError", "Login unsuccessful", 500],
       LOGOUT: ["UnknownLogoutError", "Logout failed", 403],
       LOGOUTSESSIONS: ["UnknownLogoutSessionsError", "Logout all sessions failed", 403]
-    }
+    },
+    PAYMENT: [
+      "UnknownPaymentError",
+      "Payment transaction error occurred. Please try again later",
+      500
+    ]
   }
 };

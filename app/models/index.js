@@ -105,8 +105,8 @@ db.accountUser.hasMany(db.supportTicket, {
 db.accountUser.hasMany(db.userWarranty, { as: "Warranties", foreignKey: "userId" });
 
 db.attribute.hasMany(db.itemAttribute, {
-as: "ItemAttributes",
-foreignKey: "attributeId"
+  as: "ItemAttributes",
+  foreignKey: "attributeId"
 });
 
 db.brand.hasMany(db.item, { as: "Items", foreignKey: "brandId" });
@@ -115,9 +115,9 @@ db.item.belongsTo(db.type, { as: "Type", foreignKey: "typeId" });
 db.item.belongsTo(db.brand, { as: "Brand", foreignKey: "brandId" });
 db.item.hasMany(db.itemImg, { as: "Imgs", foreignKey: "itemId", onDelete: "CASCADE" });
 db.item.hasMany(db.itemAttribute, {
-as: "ItemAttributes",
-foreignKey: "itemId",
-onDelete: "CASCADE"
+  as: "ItemAttributes",
+  foreignKey: "itemId",
+  onDelete: "CASCADE"
 });
 db.item.hasMany(db.inventory, { as: "Inventory", foreignKey: "itemId", onDelete: "CASCADE" });
 db.item.hasMany(db.itemVariation, { as: "Variations", foreignKey: "itemId", onDelete: "CASCADE" });
