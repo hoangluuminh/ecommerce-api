@@ -25,12 +25,17 @@ const userInfoChecks = [
 
 router.get("/meInfo", isAuth, hasRole(["user"]), accountUserController.getMeAccountUser);
 
-router.get("/:accountUserId", isAuth, hasRole(["admin"]), accountUserController.getAccountUser);
+router.get(
+  "/:accountUserId",
+  isAuth,
+  hasRole(["admin", "manager", "merchandiser"]),
+  accountUserController.getAccountUser
+);
 
 router.get(
   "/",
   isAuth,
-  hasRole(["admin"]),
+  hasRole(["admin", "manager", "merchandiser"]),
   [
     query("query").optional(),
     query("page")

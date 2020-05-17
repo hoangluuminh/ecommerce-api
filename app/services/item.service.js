@@ -607,6 +607,7 @@ const getItemFinalization = (item, attributes, variationName, keepAttr) => {
   // Result
   return newItem;
 };
+exports.getItemFinalization = getItemFinalization;
 
 const oneUpViewCount = async item => {
   await Item.update({ viewCount: item.viewCount + 1 }, { where: { id: item.id }, silent: true });

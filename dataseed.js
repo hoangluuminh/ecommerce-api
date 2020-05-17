@@ -387,10 +387,15 @@ async function dataSeed() {
       await db.paymentMethod.create({ id: "cc", name: "Credit Card" }, { transaction: t });
 
       // orderStatus
-      await db.orderStatus.create({ id: "processing", name: "Processing" }, { transaction: t });
-      await db.orderStatus.create({ id: "paid", name: "Paid" }, { transaction: t });
-      await db.orderStatus.create({ id: "received", name: "Received" }, { transaction: t });
-      await db.orderStatus.create({ id: "canceled", name: "Canceled" }, { transaction: t });
+      await db.orderStatus.create(
+        { id: "processing", name: "Awaiting Payment" },
+        { transaction: t }
+      );
+      await db.orderStatus.create({ id: "ordered", name: "Ordered" }, { transaction: t });
+      await db.orderStatus.create({ id: "verified", name: "Awaiting Pickup" }, { transaction: t });
+      await db.orderStatus.create({ id: "delivered", name: "Delivered" }, { transaction: t });
+      await db.orderStatus.create({ id: "rejected", name: "Rejected" }, { transaction: t });
+      await db.orderStatus.create({ id: "canceled", name: "Cancelled" }, { transaction: t });
 
       /* USER-GENERATED */
 
@@ -421,7 +426,7 @@ async function dataSeed() {
             typeId: "coupe",
             brandId: "bmw",
             year: "2018",
-            price: 10000,
+            price: 100000000,
             blog: "Car description",
             hidden: false
           },
@@ -627,7 +632,7 @@ async function dataSeed() {
           )
         ]);
         await db.userFavItem.create(
-          { itemId: `bmw-unknownicar-2018-${i}`, userId: thatUserId, price: 10000 },
+          { itemId: `bmw-unknownicar-2018-${i}`, userId: thatUserId, price: 100000000 },
           { transaction: t }
         );
         await db.itemComment.create(

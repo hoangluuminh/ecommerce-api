@@ -23,6 +23,10 @@ module.exports = (Sequelize, sequelize) => {
       isPaid: {
         type: Sequelize.BOOLEAN,
         allowNull: false
+      },
+      due: {
+        type: Sequelize.DATE,
+        allowNull: false
       }
     },
     {

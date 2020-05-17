@@ -11,12 +11,17 @@ router.get("/meInfo", isAuth, hasRole(manageRoles), accountStaffController.getMe
 
 router.get("/roles", isAuth, hasRole(manageRoles), accountStaffController.getStaffRoles);
 
-router.get("/:accountStaffId", isAuth, hasRole(["admin"]), accountStaffController.getAccountStaff);
+router.get(
+  "/:accountStaffId",
+  isAuth,
+  hasRole(["admin", "manager", "merchandiser"]),
+  accountStaffController.getAccountStaff
+);
 
 router.get(
   "/",
   isAuth,
-  hasRole(["admin"]),
+  hasRole(["admin", "manager", "merchandiser"]),
   [
     query("query").optional(),
     query("page")
