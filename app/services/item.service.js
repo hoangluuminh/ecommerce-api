@@ -595,11 +595,13 @@ const getItemFinalization = (item, attributes, variationName, keepAttr) => {
     });
   }
   // inventorySizes
-  newItem.dataValues.inventorySize = item.Inventory.length;
+  newItem.dataValues.inventorySize = 0;
   newItem.dataValues.Inventory = null;
   newItem.Variations.forEach(varia => {
-    varia.dataValues.inventorySize = varia.Inventory.length; // eslint-disable-line
+    const inventoryAvailable = varia.Inventory.filter(inv => !!inv.available && !inv.bought);
+    varia.dataValues.inventorySize = inventoryAvailable.length; // eslint-disable-line
     varia.dataValues.Inventory = null; // eslint-disable-line
+    newItem.dataValues.inventorySize += inventoryAvailable.length;
   });
 
   // Result
