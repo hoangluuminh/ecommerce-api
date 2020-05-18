@@ -23,6 +23,10 @@ const shopInfoChecks = [
     .not()
     .isEmpty()
     .withMessage("Required."),
+  check("phone")
+    .not()
+    .isEmpty()
+    .withMessage("Required."),
   check("description").optional()
 ];
 

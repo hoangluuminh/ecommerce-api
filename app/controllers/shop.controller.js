@@ -34,10 +34,10 @@ exports.updateShop = async (req, res, next) => {
     return res.status(422).json(errors);
   }
   // Declarations
-  const { name, locationLng, locationLat, address, description } = req.body;
+  const { name, locationLng, locationLat, address, phone, description } = req.body;
   // Executions
   try {
-    await shopService.updateShop(name, locationLng, locationLat, address, description);
+    await shopService.updateShop(name, locationLng, locationLat, address, phone, description);
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);

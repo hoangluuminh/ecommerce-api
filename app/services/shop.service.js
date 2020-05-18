@@ -15,7 +15,7 @@ exports.getShop = async () => {
   return shop;
 };
 // PUT: Update Shop
-exports.updateShop = async (name, locationLng, locationLat, address, description) => {
+exports.updateShop = async (name, locationLng, locationLat, address, phone, description) => {
   // Validations
   const shop = await Shop.findOne();
   if (!shop) {
@@ -23,7 +23,7 @@ exports.updateShop = async (name, locationLng, locationLat, address, description
   }
   // Executions
   await Shop.update(
-    { name, locationLng, locationLat, address, description },
+    { name, locationLng, locationLat, address, phone, description },
     {
       where: {
         id: db.sequelize.literal("1=1")

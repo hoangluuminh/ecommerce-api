@@ -376,6 +376,7 @@ async function dataSeed() {
           locationLng: "1",
           locationLat: "1",
           address: "100-102 Somewhere in this world",
+          phone: "0909000999",
           description: `${companyName} main showroom`
         },
         { transaction: t }
