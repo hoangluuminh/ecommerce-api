@@ -20,6 +20,7 @@ exports.ERRORS = {
     BRAND: ["InvalidBrandError", "Specified brand cannot be found", 400],
     INVENTORY: ["InvalidInventoryError", "Specified inventory item cannot be found", 400],
     ITEMVARIATION: ["InvalidItemVariationError", "Specified item variation cannot be found", 400],
+    SHOP: ["InvalidShopError", "Specified shop cannot be found", 400],
     // ITEMIMG: ["InvalidItemImgError", "Cannot find image", 400],
     // ITEMIMGS: ["InvalidItemImgsError", "Cannot find images", 400],
     // BRAND: ["InvalidBrandError", "Specified brand cannot be found", 400],

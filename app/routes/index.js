@@ -15,6 +15,7 @@ const attributeRoutes = require("./attribute.routes");
 const typeRoutes = require("./type.routes");
 const brandRoutes = require("./brand.routes");
 const inventoryRoutes = require("./inventory.routes");
+const shopRoutes = require("./shop.routes");
 
 // MIDDLEWARES
 router.use(authSetup); // setup for req.authFor
@@ -32,5 +33,6 @@ router.use("/attributes", attributeRoutes);
 router.use("/types", typeRoutes);
 router.use("/brands", brandRoutes);
 router.use("/inventories", inventoryRoutes);
+router.use("/shop", shopRoutes);
 
 module.exports = router;
