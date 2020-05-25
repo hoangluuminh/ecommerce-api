@@ -26,7 +26,9 @@ exports.getItems = async (req, res, next) => {
     sort,
     sortDesc,
     special,
+    scale,
     type,
+    maker,
     brand,
     year,
     price,
@@ -48,7 +50,9 @@ exports.getItems = async (req, res, next) => {
       sort,
       sortDesc,
       special,
+      scale,
       type,
+      maker,
       brand,
       year,
       price,
@@ -144,7 +148,9 @@ exports.addItem = async (req, res, next) => {
   const {
     id,
     name,
+    scale,
     type,
+    maker,
     brand,
     year,
     price,
@@ -159,7 +165,9 @@ exports.addItem = async (req, res, next) => {
     await itemService.addItem(
       id,
       name,
+      scale,
       type,
+      maker,
       brand,
       year,
       price,
@@ -175,7 +183,9 @@ exports.addItem = async (req, res, next) => {
     if (
       [
         ERRORS.UNIQUE.ITEM[0],
+        ERRORS.INVALID.SCALE[0],
         ERRORS.INVALID.TYPE[0],
+        ERRORS.INVALID.MAKER[0],
         ERRORS.INVALID.BRAND[0],
         ERRORS.INVALID.ATTRIBUTE[0],
         ERRORS.MISC.ATTRIBUTE_DYNAMIC[0]
@@ -198,13 +208,28 @@ exports.updateItem = async (req, res, next) => {
   }
   // Declarations
   const { itemId: id } = req.params;
-  const { name, type, brand, year, price, blog, hidden, images, variations, attributes } = req.body;
+  const {
+    name,
+    scale,
+    type,
+    maker,
+    brand,
+    year,
+    price,
+    blog,
+    hidden,
+    images,
+    variations,
+    attributes
+  } = req.body;
   // Executions
   try {
     await itemService.updateItem(
       id,
       name,
+      scale,
       type,
+      maker,
       brand,
       year,
       price,
@@ -220,7 +245,9 @@ exports.updateItem = async (req, res, next) => {
     if (
       [
         ERRORS.INVALID.ITEM[0],
+        ERRORS.INVALID.SCALE[0],
         ERRORS.INVALID.TYPE[0],
+        ERRORS.INVALID.MAKER[0],
         ERRORS.INVALID.BRAND[0],
         ERRORS.INVALID.ATTRIBUTE[0],
         ERRORS.MISC.ATTRIBUTE_DYNAMIC[0],

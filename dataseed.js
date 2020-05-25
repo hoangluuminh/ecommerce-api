@@ -103,6 +103,24 @@ async function dataSeed() {
         )
       ]);
 
+      // scale
+      await Promise.all([
+        db.scale.create({ id: "1_12", name: "1:12", placing: 0 }, { transaction: t }),
+        db.scale.create({ id: "1_16", name: "1:16", placing: 1 }, { transaction: t }),
+        db.scale.create({ id: "1_18", name: "1:18", placing: 2 }, { transaction: t }),
+        db.scale.create({ id: "1_24", name: "1:24", placing: 3 }, { transaction: t }),
+        db.scale.create({ id: "1_36", name: "1:36", placing: 4 }, { transaction: t })
+      ]);
+
+      // maker
+      await Promise.all([
+        db.maker.create({ id: "maisto", name: "Maisto", placing: 0 }, { transaction: t }),
+        db.maker.create({ id: "bburago", name: "Bburago", placing: 1 }, { transaction: t }),
+        db.maker.create({ id: "welly", name: "Welly", placing: 2 }, { transaction: t }),
+        db.maker.create({ id: "rarstar", name: "Rarstar", placing: 3 }, { transaction: t }),
+        db.maker.create({ id: "xlg", name: "XLG", placing: 4 }, { transaction: t })
+      ]);
+
       // brands
       await Promise.all([
         db.brand.create({ id: "tesla", name: "Tesla", placing: 0 }, { transaction: t }),
@@ -117,67 +135,27 @@ async function dataSeed() {
 
       // types
       await Promise.all([
-        // Cars
         db.type.create(
           {
-            id: "sedan",
-            name: "Sedan",
-            cartRestrict: true,
+            id: "car",
+            name: "Mô hình Ôtô",
             placing: 0
           },
           { transaction: t }
         ),
         db.type.create(
           {
-            id: "suv",
-            name: "SUV",
-            cartRestrict: true,
+            id: "motorbike",
+            name: "Mô hình Môtô",
             placing: 1
           },
           { transaction: t }
         ),
         db.type.create(
           {
-            id: "hatchback",
-            name: "Hatchback",
-            cartRestrict: true,
+            id: "construction",
+            name: "Mô hình xe công trình",
             placing: 2
-          },
-          { transaction: t }
-        ),
-        db.type.create(
-          {
-            id: "mpv",
-            name: "MPV",
-            cartRestrict: true,
-            placing: 3
-          },
-          { transaction: t }
-        ),
-        db.type.create(
-          {
-            id: "pickup",
-            name: "Pick-up",
-            cartRestrict: true,
-            placing: 4
-          },
-          { transaction: t }
-        ),
-        db.type.create(
-          {
-            id: "van",
-            name: "Van",
-            cartRestrict: true,
-            placing: 5
-          },
-          { transaction: t }
-        ),
-        db.type.create(
-          {
-            id: "coupe",
-            name: "Coupe",
-            cartRestrict: true,
-            placing: 6
           },
           { transaction: t }
         )
@@ -187,8 +165,8 @@ async function dataSeed() {
       await Promise.all([
         db.attribute.create(
           {
-            id: "transmission",
-            name: "Transmission", // Automatic, Manual, Automanual
+            id: "chat-lieu",
+            name: "Chất liệu", // Sắt, Nhựa
             valueType: "static",
             placing: 0
           },
@@ -196,8 +174,8 @@ async function dataSeed() {
         ),
         db.attribute.create(
           {
-            id: "fuel",
-            name: "Fuel", // Gasoline, Petrol, Electric, Hybrid
+            id: "xuat-xu",
+            name: "Xuất xứ", // Mỹ, Trung Quốc
             valueType: "static",
             placing: 1
           },
@@ -205,8 +183,8 @@ async function dataSeed() {
         ),
         db.attribute.create(
           {
-            id: "top-speed",
-            name: "Top speed", // 155...
+            id: "trong-luong",
+            name: "Trọng lượng",
             valueType: "dynamic",
             placing: 2
           },
@@ -214,118 +192,10 @@ async function dataSeed() {
         ),
         db.attribute.create(
           {
-            id: "top-speed-unit",
-            name: "Top speed Unit", // mph, km/h
+            id: "trong-luong-unit",
+            name: "Đơn vị Trọng lượng", // g
             valueType: "static",
             placing: 3
-          },
-          { transaction: t }
-        ),
-        db.attribute.create(
-          {
-            id: "fuel-consume",
-            name: "Fuel consumption", // 26 27 28...
-            valueType: "dynamic",
-            placing: 4
-          },
-          { transaction: t }
-        ),
-        db.attribute.create(
-          {
-            id: "fuel-consume-unit",
-            name: "Fuel consumption Unit", // MPG, l/100km
-            valueType: "static",
-            placing: 5
-          },
-          { transaction: t }
-        ),
-        db.attribute.create(
-          {
-            id: "seat",
-            name: "Seating", // 4, 7
-            valueType: "static",
-            placing: 6
-          },
-          { transaction: t }
-        ),
-        db.attribute.create(
-          {
-            id: "drivetrain",
-            name: "Drivetrain", // FWD, RWD, 4WD, 4x2, 4x4, Other
-            valueType: "static",
-            placing: 7
-          },
-          { transaction: t }
-        ),
-        db.attribute.create(
-          {
-            id: "engine",
-            name: "Engine", // TwinPower Turbo, Biturbo
-            valueType: "static",
-            placing: 8
-          },
-          { transaction: t }
-        ),
-        db.attribute.create(
-          {
-            id: "cylinder-count",
-            name: "Cylinder count", // 1, 2, 3, 4, 5, 6, 8, 10, 12,...
-            valueType: "dynamic",
-            placing: 9
-          },
-          { transaction: t }
-        ),
-        db.attribute.create(
-          {
-            id: "cylinder-capacity",
-            name: "Cylinder capacity (cc)", // 149,3
-            valueType: "dynamic",
-            placing: 10
-          },
-          { transaction: t }
-        ),
-        db.attribute.create(
-          {
-            id: "weight",
-            name: "Weight", // 100 1000 ,...
-            valueType: "dynamic",
-            placing: 11
-          },
-          { transaction: t }
-        ),
-        db.attribute.create(
-          {
-            id: "weight-unit",
-            name: "Weight Unit", // lbs, kg
-            valueType: "static",
-            placing: 12
-          },
-          { transaction: t }
-        ),
-        db.attribute.create(
-          {
-            id: "fuel-capacity",
-            name: "Fuel capacity", // 100 1000 ,...
-            valueType: "dynamic",
-            placing: 13
-          },
-          { transaction: t }
-        ),
-        db.attribute.create(
-          {
-            id: "fuel-capacity-unit",
-            name: "Fuel capacity Unit", // gallon, litre
-            valueType: "static",
-            placing: 14
-          },
-          { transaction: t }
-        ),
-        db.attribute.create(
-          {
-            id: "starter",
-            name: "Starter", // Electric
-            valueType: "static",
-            placing: 15
           },
           { transaction: t }
         )
@@ -372,12 +242,12 @@ async function dataSeed() {
       await db.shop.create(
         {
           id: "mainshop",
-          name: `${companyName} Showroom 1`,
+          name: `${companyName} TPHCM`,
           locationLng: "1",
           locationLat: "1",
           address: "100-102 Somewhere in this world",
           phone: "0909000999",
-          description: `${companyName} main showroom`
+          description: `${companyName} main shop`
         },
         { transaction: t }
       );
@@ -387,15 +257,16 @@ async function dataSeed() {
       await db.paymentMethod.create({ id: "cc", name: "Credit Card" }, { transaction: t });
 
       // orderStatus
+      await db.orderStatus.create({ id: "processing", name: "Chờ thanh toán" }, { transaction: t });
+      await db.orderStatus.create({ id: "ordered", name: "Chờ xác nhận" }, { transaction: t });
+      await db.orderStatus.create({ id: "verified", name: "Chuẩn bị hàng" }, { transaction: t });
+      await db.orderStatus.create({ id: "delivering", name: "Đang giao hàng" }, { transaction: t });
+      await db.orderStatus.create({ id: "delivered", name: "Đã nhận hàng" }, { transaction: t });
       await db.orderStatus.create(
-        { id: "processing", name: "Awaiting Payment" },
+        { id: "rejected", name: "Thanh toán thất bại" },
         { transaction: t }
       );
-      await db.orderStatus.create({ id: "ordered", name: "Ordered" }, { transaction: t });
-      await db.orderStatus.create({ id: "verified", name: "Awaiting Pickup" }, { transaction: t });
-      await db.orderStatus.create({ id: "delivered", name: "Delivered" }, { transaction: t });
-      await db.orderStatus.create({ id: "rejected", name: "Rejected" }, { transaction: t });
-      await db.orderStatus.create({ id: "canceled", name: "Cancelled" }, { transaction: t });
+      await db.orderStatus.create({ id: "canceled", name: "Đã huỷ đơn" }, { transaction: t });
 
       /* USER-GENERATED */
 
@@ -419,133 +290,57 @@ async function dataSeed() {
 
       // item
       for (let i = 1; i <= 30; i += 1) {
+        const itemId = `bmw-unknownicar-${i}-24`;
+        // eslint-disable-next-line
         await db.item.create(
           {
-            id: `bmw-unknownicar-2018-${i}`,
+            id: itemId,
             name: `BMW Unknownicar (${i})`,
-            typeId: "coupe",
+            scaleId: "1_24",
+            typeId: "car",
+            makerId: "maisto",
             brandId: "bmw",
             year: "2018",
-            price: 100000000,
-            blog: "Car description",
+            price: 1390000,
+            blog: "Xe mô hình tuyệt đẹp đến từ Mai tồ",
             hidden: false
           },
           { transaction: t }
         );
+        // eslint-disable-next-line
         await Promise.all([
           db.itemAttribute.create(
             {
-              attributeId: "seat",
-              itemId: `bmw-unknownicar-2018-${i}`,
-              value: "2", // 4, 7
+              attributeId: "chat-lieu",
+              itemId,
+              value: "Sắt",
               rating: 5
             },
             { transaction: t }
           ),
           db.itemAttribute.create(
             {
-              attributeId: "top-speed",
-              itemId: `bmw-unknownicar-2018-${i}`,
-              value: "155", // 155...
+              attributeId: "xuat-xu",
+              itemId,
+              value: "Mỹ",
               rating: 5
             },
             { transaction: t }
           ),
           db.itemAttribute.create(
             {
-              attributeId: "top-speed-unit",
-              itemId: `bmw-unknownicar-2018-${i}`,
-              value: "mph", // mph, km/h
+              attributeId: "trong-luong",
+              itemId,
+              value: "500",
               rating: 5
             },
             { transaction: t }
           ),
           db.itemAttribute.create(
             {
-              attributeId: "fuel-consume",
-              itemId: `bmw-unknownicar-2018-${i}`,
-              value: "28", // 26 27 28...
-              rating: 5
-            },
-            { transaction: t }
-          ),
-          db.itemAttribute.create(
-            {
-              attributeId: "fuel-consume-unit",
-              itemId: `bmw-unknownicar-2018-${i}`,
-              value: "MPG", // MPG, l/100km
-              rating: 5
-            },
-            { transaction: t }
-          ),
-          db.itemAttribute.create(
-            {
-              attributeId: "transmission",
-              itemId: `bmw-unknownicar-2018-${i}`,
-              value: "Manual", // Automatic, Manual, Automanual
-              rating: 5
-            },
-            { transaction: t }
-          ),
-          db.itemAttribute.create(
-            {
-              attributeId: "fuel",
-              itemId: `bmw-unknownicar-2018-${i}`,
-              value: "Petrol", // Gasoline, Petrol, Electric, Hybrid
-              rating: 5
-            },
-            { transaction: t }
-          ),
-          db.itemAttribute.create(
-            {
-              attributeId: "drivetrain",
-              itemId: `bmw-unknownicar-2018-${i}`,
-              value: "AWD", // FWD, RWD, 4WD, 4x2, 4x4, Other
-              rating: 5
-            },
-            { transaction: t }
-          ),
-          db.itemAttribute.create(
-            {
-              attributeId: "engine",
-              itemId: `bmw-unknownicar-2018-${i}`,
-              value: "TwinPower Turbo", // TwinPower Turbo, Biturbo
-              rating: 5
-            },
-            { transaction: t }
-          ),
-          db.itemAttribute.create(
-            {
-              attributeId: "weight",
-              itemId: `bmw-unknownicar-2018-${i}`,
-              value: "1000", // 100 1000 ,...
-              rating: 5
-            },
-            { transaction: t }
-          ),
-          db.itemAttribute.create(
-            {
-              attributeId: "weight-unit",
-              itemId: `bmw-unknownicar-2018-${i}`,
-              value: "lbs", // lbs, kg
-              rating: 5
-            },
-            { transaction: t }
-          ),
-          db.itemAttribute.create(
-            {
-              attributeId: "fuel-capacity",
-              itemId: `bmw-unknownicar-2018-${i}`,
-              value: "100", // 100 1000 ,...
-              rating: 5
-            },
-            { transaction: t }
-          ),
-          db.itemAttribute.create(
-            {
-              attributeId: "fuel-capacity-unit",
-              itemId: `bmw-unknownicar-2018-${i}`,
-              value: "gallon", // gallon, litre
+              attributeId: "trong-luong-unit",
+              itemId,
+              value: "g",
               rating: 5
             },
             { transaction: t }
@@ -553,11 +348,12 @@ async function dataSeed() {
         ]);
         const variationRedId = generateId();
         const variationNightBlueId = generateId();
+        // eslint-disable-next-line
         await Promise.all([
           db.itemVariation.create(
             {
               id: variationRedId,
-              itemId: `bmw-unknownicar-2018-${i}`,
+              itemId,
               name: "Red",
               colors: "FF0000",
               placing: 0
@@ -567,19 +363,20 @@ async function dataSeed() {
           db.itemVariation.create(
             {
               id: variationNightBlueId,
-              itemId: `bmw-unknownicar-2018-${i}`,
-              name: "Night Blue",
+              itemId,
+              name: "Striped Blue",
               colors: "0057FF,303030",
               placing: 1
             },
             { transaction: t }
           )
         ]);
+        // eslint-disable-next-line
         await Promise.all([
           db.inventory.create(
             {
               id: `1HGBH41JXMN00001${i}`,
-              itemId: `bmw-unknownicar-2018-${i}`,
+              itemId,
               variationId: variationRedId,
               available: true,
               bought: false
@@ -589,7 +386,7 @@ async function dataSeed() {
           db.inventory.create(
             {
               id: `1HGBH41JXMN00002${i}`,
-              itemId: `bmw-unknownicar-2018-${i}`,
+              itemId,
               variationId: variationNightBlueId,
               available: true,
               bought: true
@@ -597,10 +394,11 @@ async function dataSeed() {
             { transaction: t }
           )
         ]);
+        // eslint-disable-next-line
         await Promise.all([
           db.itemImg.create(
             {
-              itemId: `bmw-unknownicar-2018-${i}`,
+              itemId,
               mediaId: 1,
               placing: 0
             },
@@ -608,7 +406,7 @@ async function dataSeed() {
           ),
           db.itemImg.create(
             {
-              itemId: `bmw-unknownicar-2018-${i}`,
+              itemId,
               mediaId: 2,
               placing: 1
             },
@@ -616,7 +414,7 @@ async function dataSeed() {
           ),
           db.itemImg.create(
             {
-              itemId: `bmw-unknownicar-2018-${i}`,
+              itemId,
               mediaId: 3,
               placing: 2
             },
@@ -624,30 +422,32 @@ async function dataSeed() {
           ),
           db.itemImg.create(
             {
-              itemId: `bmw-unknownicar-2018-${i}`,
+              itemId,
               mediaId: 4,
               placing: 3
             },
             { transaction: t }
           )
         ]);
+        // eslint-disable-next-line
         await db.userFavItem.create(
-          { itemId: `bmw-unknownicar-2018-${i}`, userId: thatUserId, price: 100000000 },
+          { itemId, userId: thatUserId, price: 100000000 },
           { transaction: t }
         );
+        // eslint-disable-next-line
         await db.itemComment.create(
           {
             id: generateId(),
-            itemId: `bmw-unknownicar-2018-${i}`,
+            itemId,
             userId: thatUserId,
             rating: 5,
-            comment: "This car is so cool, it puts Elon Musk to shame!!!"
+            comment: "Xe đẹp, dá phải trăng, LIKE (y) (y)!!!"
           },
           { transaction: t }
         );
       }
 
-      // promotion, promotionItem, voucher
+      // promotion, promotionItem
       const promotion1 = await db.promotion.create(
         {
           id: generateId(),
@@ -660,7 +460,7 @@ async function dataSeed() {
         { transaction: t }
       );
       await db.promotionItem.create(
-        { promoId: promotion1.id, itemId: "bmw-unknownicar-2018-1" },
+        { promoId: promotion1.id, itemId: "bmw-unknownicar-1-24" },
         { transaction: t }
       );
     });

@@ -54,6 +54,10 @@ module.exports = (Sequelize, sequelize) => {
       payee_phone: {
         type: Sequelize.STRING(50),
         allowNull: false
+      },
+      payee_address: {
+        type: Sequelize.STRING(50),
+        allowNull: false
       }
     },
     {

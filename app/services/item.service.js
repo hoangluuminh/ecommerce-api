@@ -10,8 +10,10 @@ const moment = MomentRange.extendMoment(Moment);
 const { Op, fn, col, literal } = db.Sequelize;
 const {
   item: Item,
-  brand: Brand,
+  scale: Scale,
   type: Type,
+  maker: Maker,
+  brand: Brand,
   itemVariation: ItemVariation,
   itemImg: ItemImg,
   itemAttribute: ItemAttribute,
@@ -37,7 +39,9 @@ exports.getItems = async (
   sort,
   sortDesc,
   special,
+  scale,
   type,
+  maker,
   brand,
   year,
   price,
@@ -61,13 +65,18 @@ exports.getItems = async (
       break;
     }
     case "id":
-    case "type":
-    case "brand":
     case "year":
     case "price":
     case "createdAt":
     case "updatedAt": {
       orders = [[sort, sortDesc ? "DESC" : "ASC"]];
+      break;
+    }
+    case "scale":
+    case "type":
+    case "maker":
+    case "brand": {
+      orders = [[`${sort}Id`, sortDesc ? "DESC" : "ASC"]];
       break;
     }
   }
@@ -117,8 +126,10 @@ exports.getItems = async (
       },
       // hidden
       { hidden: !withHidden ? false : db.sequelize.literal("1=1") },
-      // type, brand
+      // scale, type, maker, brand
+      { scaleId: scale || db.sequelize.literal("1=1") },
       { typeId: type || db.sequelize.literal("1=1") },
+      { makerId: maker || db.sequelize.literal("1=1") },
       { brandId: brand || db.sequelize.literal("1=1") },
       // priceFrom, priceTo
       { price: { [Op.between]: [priceFrom, priceTo] } },
@@ -254,7 +265,9 @@ exports.getItemFilterValues = async () => {
 exports.addItem = async (
   id,
   name,
+  scale,
   type,
+  maker,
   brand,
   year,
   price,
@@ -271,14 +284,25 @@ exports.addItem = async (
   }
   // eslint-disable-next-line
   try {
-    await itemInfoValidation(type, brand, attributes); // eslint-disable-line
+    await itemInfoValidation(scale, type, maker, brand, attributes); // eslint-disable-line
   } catch (e) {
     throw e;
   }
   // Executions
   db.sequelize.transaction(async t => {
     await Item.create(
-      { id, name, typeId: type, brandId: brand, year, price, blog, hidden },
+      {
+        id,
+        name,
+        scaleId: scale,
+        typeId: type,
+        makerId: maker,
+        brandId: brand,
+        year,
+        price,
+        blog,
+        hidden
+      },
       { transaction: t }
     );
     await ItemImg.bulkCreate(
@@ -316,7 +340,9 @@ exports.addItem = async (
 exports.updateItem = async (
   id,
   name,
+  scale,
   type,
+  maker,
   brand,
   year,
   price,
@@ -359,7 +385,7 @@ exports.updateItem = async (
   }
   // eslint-disable-next-line
   try {
-    await itemInfoValidation(type, brand, attributes); // eslint-disable-line
+    await itemInfoValidation(scale, type, maker, brand, attributes); // eslint-disable-line
   } catch (e) {
     throw e;
   }
@@ -370,7 +396,17 @@ exports.updateItem = async (
   // Executions
   db.sequelize.transaction(async t => {
     await Item.update(
-      { name, typeId: type, brandId: brand, year, price, blog, hidden },
+      {
+        name,
+        scaleId: scale,
+        typeId: type,
+        makerId: maker,
+        brandId: brand,
+        year,
+        price,
+        blog,
+        hidden
+      },
       { where: { id } },
       { transaction: t }
     );
@@ -483,8 +519,18 @@ const getItemPreparation = async attributes => {
   // Includes
   const includes = [
     {
+      model: Scale,
+      as: "Scale",
+      required: true
+    },
+    {
       model: Type,
       as: "Type",
+      required: true
+    },
+    {
+      model: Maker,
+      as: "Maker",
       required: true
     },
     {
@@ -613,10 +659,18 @@ const oneUpViewCount = async item => {
   await Item.update({ viewCount: item.viewCount + 1 }, { where: { id: item.id }, silent: true });
 };
 
-const itemInfoValidation = async (type, brand, attributes) => {
+const itemInfoValidation = async (scale, type, maker, brand, attributes) => {
+  const existingScale = await Scale.findOne({ where: { id: scale } });
+  if (!existingScale) {
+    throw new HttpError(...ERRORS.INVALID.SCALE);
+  }
   const existingType = await Type.findOne({ where: { id: type } });
   if (!existingType) {
     throw new HttpError(...ERRORS.INVALID.TYPE);
+  }
+  const existingMaker = await Maker.findOne({ where: { id: maker } });
+  if (!existingMaker) {
+    throw new HttpError(...ERRORS.INVALID.MAKER);
   }
   const existingBrand = await Brand.findOne({ where: { id: brand } });
   if (!existingBrand) {
