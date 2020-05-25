@@ -11,7 +11,15 @@ module.exports = (Sequelize, sequelize) => {
         type: Sequelize.STRING(50),
         allowNull: false
       },
+      scaleId: {
+        type: Sequelize.STRING(50),
+        allowNull: false
+      },
       typeId: {
+        type: Sequelize.STRING(50),
+        allowNull: false
+      },
+      makerId: {
         type: Sequelize.STRING(50),
         allowNull: false
       },

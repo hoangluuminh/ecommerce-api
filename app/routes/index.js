@@ -13,7 +13,9 @@ const accountStaffRoutes = require("./accountStaff.routes");
 
 const itemRoutes = require("./item.routes");
 const attributeRoutes = require("./attribute.routes");
+const scaleRoutes = require("./scale.routes");
 const typeRoutes = require("./type.routes");
+const makerRoutes = require("./maker.routes");
 const brandRoutes = require("./brand.routes");
 
 const inventoryRoutes = require("./inventory.routes");
@@ -34,7 +36,9 @@ router.use("/accountStaff", accountStaffRoutes);
 
 router.use("/items", itemRoutes);
 router.use("/attributes", attributeRoutes);
+router.use("/scales", scaleRoutes);
 router.use("/types", typeRoutes);
+router.use("/makers", makerRoutes);
 router.use("/brands", brandRoutes);
 
 router.use("/inventories", inventoryRoutes);

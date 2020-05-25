@@ -12,7 +12,15 @@ const itemInfoChecks = [
     .not()
     .isEmpty()
     .withMessage("Required."),
+  check("scale")
+    .not()
+    .isEmpty()
+    .withMessage("Required."),
   check("type")
+    .not()
+    .isEmpty()
+    .withMessage("Required."),
+  check("maker")
     .not()
     .isEmpty()
     .withMessage("Required."),
@@ -72,14 +80,16 @@ router.get(
       .toInt()
       .withMessage("must be a number"),
     query("sort")
-      .matches(/^(id|name|type|brand|year|price|createdAt|updatedAt)$/)
+      .matches(/^(id|name|scale|type|maker|brand|year|price|createdAt|updatedAt)$/)
       .withMessage("value is not valid"),
     query("sortDesc").toBoolean(),
     query("special")
       .matches(/^(hot|new)$/)
       .optional()
       .withMessage("value is not valid"),
+    query("scale").optional(),
     query("type").optional(),
+    query("maker").optional(),
     query("brand").optional(),
     query("year").optional(),
     query("price").optional(),

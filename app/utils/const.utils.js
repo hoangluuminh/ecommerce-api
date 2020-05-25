@@ -16,7 +16,9 @@ exports.ERRORS = {
     //
     ITEM: ["InvalidItemError", "Specified item cannot be found", 400],
     ATTRIBUTE: ["InvalidAttributeError", "Specified attribute cannot be found", 400],
+    SCALE: ["InvalidScaleError", "Specified scale cannot be found", 400],
     TYPE: ["InvalidTypeError", "Specified type cannot be found", 400],
+    MAKER: ["InvalidMakerError", "Specified maker cannot be found", 400],
     BRAND: ["InvalidBrandError", "Specified brand cannot be found", 400],
     INVENTORY: ["InvalidInventoryError", "Specified inventory item cannot be found", 400],
     ITEMVARIATION: ["InvalidItemVariationError", "Specified item variation cannot be found", 400],
@@ -45,7 +47,9 @@ exports.ERRORS = {
     USER_USERNAME: ["UniqueUserUsernameError", "Username already exists", 400],
     USER_EMAIL: ["UniqueUserEmailError", "Email already exists", 400],
     ITEM: ["UniqueItemError", "Item already exists", 400],
+    SCALE: ["UniqueScaleError", "Scale already exists", 400],
     TYPE: ["UniqueTypeError", "Type already exists", 400],
+    MAKER: ["UniqueMakerError", "Maker already exists", 400],
     BRAND: ["UniqueBrandError", "Brand already exists", 400],
     ATTRIBUTE: ["DuplicateAttributeError", "Attribute already exists", 400],
     INVENTORY: ["UniqueInventoryError", "One of the provided indentifiers already exists", 400]

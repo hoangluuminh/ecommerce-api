@@ -11,6 +11,7 @@ const itemAttribute = require("./itemAttribute");
 const itemComment = require("./itemComment");
 const itemImg = require("./itemImg");
 const itemVariation = require("./itemVariation");
+const maker = require("./maker");
 const media = require("./media");
 const order = require("./order");
 const orderDetail = require("./orderDetail");
@@ -18,6 +19,7 @@ const orderPayment = require("./orderPayment");
 const paymentMethod = require("./paymentMethod");
 const promotion = require("./promotion");
 const promotionItem = require("./promotionItem");
+const scale = require("./scale");
 const shop = require("./shop");
 const inventory = require("./inventory");
 const staffRole = require("./staffRole");
@@ -27,8 +29,6 @@ const supportType = require("./supportType");
 const type = require("./type");
 const userFavItem = require("./userFavItem");
 const userInfo = require("./userInfo");
-const userWarranty = require("./userWarranty");
-const warrantyService = require("./warrantyService");
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
@@ -52,6 +52,7 @@ const db = {
   itemComment: itemComment(Sequelize, sequelize),
   itemImg: itemImg(Sequelize, sequelize),
   itemVariation: itemVariation(Sequelize, sequelize),
+  maker: maker(Sequelize, sequelize),
   media: media(Sequelize, sequelize),
   order: order(Sequelize, sequelize),
   orderDetail: orderDetail(Sequelize, sequelize),
@@ -59,6 +60,7 @@ const db = {
   paymentMethod: paymentMethod(Sequelize, sequelize),
   promotion: promotion(Sequelize, sequelize),
   promotionItem: promotionItem(Sequelize, sequelize),
+  scale: scale(Sequelize, sequelize),
   shop: shop(Sequelize, sequelize),
   inventory: inventory(Sequelize, sequelize),
   staffRole: staffRole(Sequelize, sequelize),
@@ -67,9 +69,7 @@ const db = {
   supportType: supportType(Sequelize, sequelize),
   type: type(Sequelize, sequelize),
   userFavItem: userFavItem(Sequelize, sequelize),
-  userInfo: userInfo(Sequelize, sequelize),
-  userWarranty: userWarranty(Sequelize, sequelize),
-  warrantyService: warrantyService(Sequelize, sequelize)
+  userInfo: userInfo(Sequelize, sequelize)
 };
 
 // RELATIONS
@@ -102,7 +102,6 @@ db.accountUser.hasMany(db.supportTicket, {
   as: "SupportTickets",
   foreignKey: "customer"
 });
-db.accountUser.hasMany(db.userWarranty, { as: "Warranties", foreignKey: "userId" });
 
 db.attribute.hasMany(db.itemAttribute, {
   as: "ItemAttributes",
@@ -111,7 +110,9 @@ db.attribute.hasMany(db.itemAttribute, {
 
 db.brand.hasMany(db.item, { as: "Items", foreignKey: "brandId" });
 
+db.item.belongsTo(db.scale, { as: "Scale", foreignKey: "scaleId" });
 db.item.belongsTo(db.type, { as: "Type", foreignKey: "typeId" });
+db.item.belongsTo(db.maker, { as: "Maker", foreignKey: "makerId" });
 db.item.belongsTo(db.brand, { as: "Brand", foreignKey: "brandId" });
 db.item.hasMany(db.itemImg, { as: "Imgs", foreignKey: "itemId", onDelete: "CASCADE" });
 db.item.hasMany(db.itemAttribute, {
@@ -144,6 +145,8 @@ db.itemVariation.hasMany(db.inventory, {
   foreignKey: "variationId",
   onDelete: "CASCADE"
 });
+
+db.maker.hasMany(db.item, { as: "Items", foreignKey: "makerId" });
 
 db.media.hasMany(db.itemImg, { as: "ItemImgs", foreignKey: "mediaId" });
 
@@ -182,7 +185,8 @@ db.promotionItem.belongsTo(db.item, { as: "Item", foreignKey: "itemId" });
 db.inventory.belongsTo(db.item, { as: "Item", foreignKey: "itemId" });
 db.inventory.belongsTo(db.itemVariation, { as: "Variation", foreignKey: "variationId" });
 db.inventory.hasMany(db.orderDetail, { as: "OrderDetails", foreignKey: "item_inventoryId" });
-db.inventory.hasMany(db.userWarranty, { as: "UserWarranties", foreignKey: "inventoryId" });
+
+db.scale.hasMany(db.item, { as: "Items", foreignKey: "scaleId" });
 
 db.staffRole.hasMany(db.accountStaff, { as: "Staffs", foreignKey: "roleId" });
 
@@ -201,13 +205,6 @@ db.userFavItem.belongsTo(db.accountUser, { as: "User", foreignKey: "userId" });
 db.userFavItem.belongsTo(db.item, { as: "Item", foreignKey: "itemId" });
 
 db.userInfo.belongsTo(db.userInfo, { as: "User", foreignKey: "userId" });
-
-db.userWarranty.belongsTo(db.inventory, { as: "InventoryItem", foreignKey: "inventoryId" });
-db.userWarranty.belongsTo(db.accountUser, { as: "User", foreignKey: "userId" });
-db.userWarranty.hasMany(db.warrantyService, {
-  as: "WarrantyServices",
-  foreignKey: "userWarrantyId"
-});
 
 // MANY TO MANY
 
