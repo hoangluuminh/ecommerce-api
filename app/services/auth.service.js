@@ -80,12 +80,13 @@ exports.performLogin = async (req, username, password, remember) => {
     // Establish Redis connection
     const redisClient = redisService.redisClientInit();
     // Retrieve Refresh Token list if exists
-    const storedRefreshTokens = await redisClient
-      .get(userData.id)
-      .then(val => (JSON.parse(val) ? JSON.parse(val).refreshTokens : [])); // TODO: Upgrade to OPTIONAL CHAINING
-    // .then(val => JSON.parse(val)?.refreshTokens || [])
+    const storedUserRedis = await redisClient.get(userData.id).then(val => JSON.parse(val) || null);
+    const storedRefreshTokens = (storedUserRedis && storedUserRedis.refreshTokens) || [];
     storedRefreshTokens.push(refreshToken);
-    await redisClient.set(userData.id, JSON.stringify({ refreshTokens: storedRefreshTokens }));
+    await redisClient.set(
+      userData.id,
+      JSON.stringify({ ...storedUserRedis, refreshTokens: storedRefreshTokens })
+    );
   }
 
   return {
@@ -99,14 +100,15 @@ exports.performSignOut = async (refreshTokenFromClient, accountId) => {
   // Establish Redis connection
   const redisClient = redisService.redisClientInit();
   // Remove Refresh Token from refreshToken list based on cookie's token and accountId
-  const updatedRefreshTokens = await redisClient
-    .get(accountId)
-    .then(val =>
-      (JSON.parse(val) ? JSON.parse(val).refreshTokens : []).filter(
-        token => token !== refreshTokenFromClient
-      )
-    );
-  await redisClient.set(accountId, JSON.stringify({ refreshTokens: updatedRefreshTokens }));
+  const storedUserRedis = await redisClient.get(accountId).then(val => JSON.parse(val) || null);
+  const storedRefreshTokens = (storedUserRedis && storedUserRedis.refreshTokens) || [];
+  const updatedRefreshTokens = storedRefreshTokens.filter(
+    token => token !== refreshTokenFromClient
+  );
+  await redisClient.set(
+    accountId,
+    JSON.stringify({ ...storedUserRedis, refreshTokens: updatedRefreshTokens })
+  );
   return 1;
 };
 
@@ -130,15 +132,9 @@ exports.performRefreshToken = async refreshTokenFromClient => {
   }
   // Retrieve Refresh Token list by user id, check if exists
   const userData = decoded.data;
-  const storedRefreshToken = await redisClient.get(userData.id).then(val => {
-    // TODO: Upgrade to OPTIONAL CHAINING
-    const refreshTokens = JSON.parse(val) ? JSON.parse(val).refreshTokens : null;
-    if (refreshTokens) {
-      return refreshTokens.find(token => token === refreshTokenFromClient) || null;
-    }
-    return null;
-  });
-  // .then((val) => JSON.parse(val)?.refreshTokens?.find(token => token === refreshTokenFromClient))
+  const storedUserRedis = await redisClient.get(userData.id).then(val => JSON.parse(val) || null);
+  const storedRefreshTokens = (storedUserRedis && storedUserRedis.refreshTokens) || [];
+  const storedRefreshToken = storedRefreshTokens.find(token => token === refreshTokenFromClient);
   if (!storedRefreshToken || storedRefreshToken !== refreshTokenFromClient) {
     throw new LogError(
       "RedisRefreshTokenError",

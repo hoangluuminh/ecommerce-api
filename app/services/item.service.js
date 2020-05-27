@@ -580,6 +580,7 @@ const getItemPreparation = async attributes => {
   // Results
   return [includes];
 };
+exports.getItemPreparation = getItemPreparation;
 
 const getItemFinalization = (item, attributes, variationName, keepAttr) => {
   // attributes filter
@@ -604,6 +605,7 @@ const getItemFinalization = (item, attributes, variationName, keepAttr) => {
   }
 
   const newItem = item; // NEW ITEM
+
   // promotion => priceSale
   newItem.dataValues.priceSale = newItem.price;
   if (newItem.PromotionItems.length > 0) {
@@ -640,7 +642,7 @@ const getItemFinalization = (item, attributes, variationName, keepAttr) => {
       }
     });
   }
-  // inventorySizes
+  // Inventory => inventorySizes
   newItem.dataValues.inventorySize = 0;
   newItem.dataValues.Inventory = null;
   newItem.Variations.forEach(varia => {
@@ -649,6 +651,13 @@ const getItemFinalization = (item, attributes, variationName, keepAttr) => {
     varia.dataValues.Inventory = null; // eslint-disable-line
     newItem.dataValues.inventorySize += inventoryAvailable.length;
   });
+  // Variations + inventorySizes => variationDefault
+  const variationDefault = newItem.Variations.find(varia => varia.dataValues.inventorySize > 0);
+  if (variationDefault) {
+    newItem.dataValues.variationDefault = variationDefault.id;
+  } else {
+    newItem.dataValues.variationDefault = newItem.Variations[0].id;
+  }
 
   // Result
   return newItem;

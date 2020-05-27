@@ -96,11 +96,7 @@ exports.ERRORS = {
       "One of the specified variations does not belong to its item.",
       400
     ],
-    ORDER_QUANTITY: [
-      "OrderQuantityError",
-      "Item with specified variation is currently out of stock.", // Since Autogo only allows quantity=1
-      400
-    ],
+    ORDER_QUANTITY: ["OrderQuantityError", "Insufficient stock for demanded item.", 400],
     ORDER_FORBIDDEN: ["OrderForbiddenError", "This action cannot be performed on this order.", 400],
     ORDER_EXCEEDDOWNPAYMENT: [
       "OrderExceedDownpaymentError",

@@ -7,6 +7,7 @@ const { authSetup } = require("../middlewares/auth.middleware");
 const authRoutes = require("./auth.routes");
 const mediaRoutes = require("./media.routes");
 const paymentRoutes = require("./payment.routes");
+const cartRoutes = require("./cart.routes");
 
 const accountUserRoutes = require("./accountUser.routes");
 const accountStaffRoutes = require("./accountStaff.routes");
@@ -30,6 +31,7 @@ router.use(authSetup); // setup for req.authFor
 router.use("/auth", authRoutes);
 router.use("/media", mediaRoutes);
 router.use("/payment", paymentRoutes);
+router.use("/cart", cartRoutes);
 
 router.use("/accountUser", accountUserRoutes);
 router.use("/accountStaff", accountStaffRoutes);
