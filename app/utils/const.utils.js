@@ -38,7 +38,7 @@ exports.ERRORS = {
     STAFF_ROLE: ["InvalidRoleError", "Specified role does not exist", 400]
   },
   DUPLICATE: {
-    INVENTORY: ["DuplicateInventoryError", "Found duplication in identifiers list", 400]
+    INVENTORY: ["DuplicateInventoryError", "Found duplication of Inventory Item IDs", 400]
     // ITEMIMGURL: ["DuplicateItemImgURLError", "Image with specified URL already exists", 400],
     // BRAND: ["DuplicateBrandError", "Brand with specified id already exists", 400],
     // CATEGORY: ["DuplicateCategoryError", "Category with specified id already exists", 400]

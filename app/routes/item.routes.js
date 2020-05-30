@@ -53,7 +53,7 @@ const itemInfoChecks = [
         return true;
       }
       for (let i = 0; i < value.length; i += 1) {
-        if (!_.isEqual(Object.keys(value[i]), ["name", "colors"])) {
+        if (!["name", "colors"].every(v => Object.keys(value[i]).includes(v))) {
           return false;
         }
       }

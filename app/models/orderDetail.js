@@ -28,10 +28,6 @@ module.exports = (Sequelize, sequelize) => {
         type: Sequelize.FLOAT,
         allowNull: false
       },
-      item_quantity: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
       item_inventoryId: {
         type: Sequelize.STRING(50),
         allowNull: true

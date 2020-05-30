@@ -1,3 +1,5 @@
+const _ = require("lodash");
+
 const db = require("../models");
 
 const { Op, fn, col } = db.Sequelize;
@@ -117,10 +119,6 @@ exports.getOrder = async orderId => {
       required: true
     },
     {
-      model: OrderDetail,
-      as: "Items"
-    },
-    {
       model: OrderPayment,
       as: "OrderPayments",
       include: [{ model: PaymentMethod, as: "paymentMethod" }]
@@ -173,10 +171,6 @@ exports.getMeOrder = async (accountUserId, orderId) => {
       required: true
     },
     {
-      model: OrderDetail,
-      as: "Items"
-    },
-    {
       model: OrderPayment,
       as: "OrderPayments",
       include: [{ model: PaymentMethod, as: "paymentMethod" }]
@@ -199,9 +193,9 @@ exports.getOrderStatuses = async () => {
   return { orderStatuses, count };
 };
 
-// Add POS Order / Add Online Order
+// Add Cod Order / Add Online Order
 exports.addOrder = async (userId, billingDetails, loan, cart, options) => {
-  const { orderId: _orderId, isPos } = options;
+  const { orderId: _orderId, isCod, isPos } = options;
   // Validations
   const accountUser = await Account.findOne({
     include: [
@@ -223,7 +217,7 @@ exports.addOrder = async (userId, billingDetails, loan, cart, options) => {
   // eslint-disable-next-line
   try {
     const orderDetailsResult = await getOrderDetails(cart); // eslint-disable-line
-    orderDetails = orderDetailsResult.orderDetails;
+    orderDetails = orderDetailsResult.orderDetails; // is ItemVariation
     totalPayment = orderDetailsResult.totalPayment;
     appliedPromotions = orderDetailsResult.appliedPromotions;
   } catch (e) {
@@ -253,7 +247,7 @@ exports.addOrder = async (userId, billingDetails, loan, cart, options) => {
       {
         id: orderId,
         userId,
-        statusId: isPos ? "ordered" : "processing",
+        statusId: isCod || isPos ? "ordered" : "processing",
         totalPrice: totalPayment,
         appliedPromotion: appliedPromotions || null,
         // LOAN
@@ -264,27 +258,44 @@ exports.addOrder = async (userId, billingDetails, loan, cart, options) => {
         payee_lastName: billingDetails.lastName,
         payee_firstName: billingDetails.firstName,
         payee_email: billingDetails.email,
-        payee_phone: billingDetails.phone
+        payee_phone: billingDetails.phone,
+        payee_address: billingDetails.address
       },
       { transaction: t }
     );
     await OrderDetail.bulkCreate(
-      orderDetails.map(orderDetail => ({
-        orderId,
-        item_id: orderDetail.id,
-        item_variationId: cart.find(cItem => cItem.itemId === orderDetail.id).variationId,
-        item_name: orderDetail.name,
-        item_price: orderDetail.dataValues.priceSale,
-        item_quantity: cart.find(cItem => cItem.itemId === orderDetail.id).quantity
-      })),
+      orderDetails
+        .reduce((newOrderDetails, oD) => {
+          // Split by quantity
+          const cartItemQuantity = cart.find(i => i.variationId === oD.dataValues.id).quantity;
+          for (let i = 0; i < cartItemQuantity; i += 1) {
+            newOrderDetails.push(oD);
+          }
+          return newOrderDetails;
+        }, [])
+        .map(orderDetail => ({
+          orderId,
+          item_id: orderDetail.Item.id,
+          item_variationId: orderDetail.dataValues.id,
+          item_name: `${orderDetail.Item.name} (${
+            // Get variation name from Item.Variations based on cart
+            orderDetail.Item.Variations.find(
+              varia =>
+                varia.id ===
+                cart.find(cI => cI.variationId === orderDetail.dataValues.id).variationId
+            ).name
+          })`,
+          item_price: orderDetail.Item.dataValues.priceSale
+        })),
       { transaction: t }
     );
     await OrderPayment.create(
+      // at POS, only accepts Cash unless prompted to pay with webapp
       {
         orderId,
-        paymentMethodId: isPos ? "cash" : "cc", // at POS, only accepts Cash unless prompted to pay with webapp
+        paymentMethodId: isCod || isPos ? "cash" : "cc",
         paymentAmount: loan ? loan.downPayment : totalPayment,
-        isPaid: !!isPos, // automatically PAID if created at POS, otherwise, wait for Stripe
+        isPaid: !!isPos, // automatically PAID if created at POS, otherwise, wait for Stripe (if online) or wait for completeOrder (COD)
         due: new Date(Date.now())
       },
       { transaction: t }
@@ -300,6 +311,9 @@ exports.verifyOrder = async (orderId, orderDetails, verifier) => {
   const checkingOrder = await Order.findOne({ where: { id: orderId } });
   if (!checkingOrder) {
     throw new HttpError(...ERRORS.INVALID.ORDER);
+  }
+  if (_.uniq(orderDetails.map(oD => oD.inventoryId)).length !== orderDetails.length) {
+    throw new HttpError(...ERRORS.DUPLICATE.INVENTORY);
   }
   if (checkingOrder.statusId !== "ordered") {
     throw new HttpError(...ERRORS.MISC.ORDER_FORBIDDEN);
@@ -317,16 +331,14 @@ exports.verifyOrder = async (orderId, orderDetails, verifier) => {
   if (!accountStaff) {
     throw new HttpError(...ERRORS.INVALID.ACCOUNTUSER);
   }
-  /* variationId check */
-  const checkingOrderDetails = await OrderDetail.findAll({
+  /* orderDetail id check */
+  const fetchedOrderDetails = await OrderDetail.findAll({
     where: {
       orderId,
-      [Op.or]: orderDetails.map(oD => ({
-        item_variationId: oD.variationId
-      }))
+      [Op.or]: orderDetails.map(oD => ({ id: oD.id }))
     }
   });
-  if (checkingOrderDetails.length !== orderDetails.length) {
+  if (fetchedOrderDetails.length !== orderDetails.length) {
     throw new HttpError(...ERRORS.MISC.ORDERDETAIL_MISMATCH);
   }
   /* inventoryId check */
@@ -338,14 +350,15 @@ exports.verifyOrder = async (orderId, orderDetails, verifier) => {
       }
     ],
     where: {
-      [Op.or]: orderDetails.map(oD => ({
-        id: oD.variationId
+      [Op.or]: fetchedOrderDetails.map(oD => ({
+        id: oD.item_variationId
       }))
     }
   });
   for (let i = 0; i < orderDetails.length; i += 1) {
+    const fetchedOrderDetail = fetchedOrderDetails.find(oD => oD.id === orderDetails[i].id);
     const checkingInventoryItems = seqVariations.find(
-      varia => varia.id === orderDetails[i].variationId
+      varia => varia.id === fetchedOrderDetail.item_variationId
     ).Inventory;
     if (!checkingInventoryItems.map(inv => inv.id).includes(orderDetails[i].inventoryId)) {
       throw new HttpError(...ERRORS.MISC.INVENTORY_INCORRECTVARIATION);
@@ -368,8 +381,8 @@ exports.verifyOrder = async (orderId, orderDetails, verifier) => {
         },
         {
           where: {
-            orderId,
-            item_variationId: orderDetails[i].variationId
+            id: orderDetails[i].id,
+            orderId
           }
         },
         { transaction: t }
@@ -380,8 +393,8 @@ exports.verifyOrder = async (orderId, orderDetails, verifier) => {
   });
 };
 
-// PATCH: Updating Order's status to "Delivered"
-exports.completeOrder = async orderId => {
+// PATCH: Updating Order's status to "Delivering"
+exports.startDeliverOrder = async orderId => {
   // Validations
   const checkingOrder = await Order.findOne({ where: { id: orderId } });
   if (!checkingOrder) {
@@ -393,7 +406,7 @@ exports.completeOrder = async orderId => {
   // Executions
   const orderDetails = await OrderDetail.findAll({ where: { orderId } });
   db.sequelize.transaction(async t => {
-    await Order.update({ statusId: "delivered" }, { where: { id: orderId } }, { transaction: t });
+    await Order.update({ statusId: "delivering" }, { where: { id: orderId } }, { transaction: t });
     for (let i = 0; i < orderDetails.length; i += 1) {
       // eslint-disable-next-line
       await Inventory.update(
@@ -402,6 +415,24 @@ exports.completeOrder = async orderId => {
         { transaction: t }
       );
     }
+  });
+};
+
+// PATCH: Updating Order's status to "Delivered"
+exports.completeOrder = async orderId => {
+  // Validations
+  const checkingOrder = await Order.findOne({ where: { id: orderId } });
+  if (!checkingOrder) {
+    throw new HttpError(...ERRORS.INVALID.ORDER);
+  }
+  if (checkingOrder.statusId !== "delivering") {
+    throw new HttpError(...ERRORS.MISC.ORDER_FORBIDDEN);
+  }
+  // Executions
+  db.sequelize.transaction(async t => {
+    await Order.update({ statusId: "delivered" }, { where: { id: orderId } }, { transaction: t });
+    // for COD Order, should disable/adjust if dev ever plan to apply LOAN PAYMENT
+    await OrderPayment.update({ isPaid: true }, { where: { orderId } }, { transaction: t });
   });
 };
 
@@ -422,46 +453,64 @@ exports.cancelOrder = async orderId => {
 /* ---------- */
 /* ULTILITIES */
 const getOrderDetails = async cart => {
-  const seqCartItemsDetail = await Item.findAll({
+  const seqCartItemsDetail = await ItemVariation.findAll({
     include: [
       {
-        model: PromotionItem,
-        as: "PromotionItems",
-        include: { model: Promotion, as: "Promotion" }
+        model: Item,
+        as: "Item",
+        include: [
+          {
+            model: PromotionItem,
+            as: "PromotionItems",
+            include: { model: Promotion, as: "Promotion" }
+          },
+          {
+            model: Inventory,
+            as: "Inventory"
+          },
+          {
+            model: ItemVariation, // NEEDED FOR ItemFinalization, inventorySize
+            as: "Variations",
+            include: { model: Inventory, as: "Inventory" },
+            required: true,
+            attributes: ["id", "name", "colors", "placing"]
+          }
+        ]
       },
-      {
-        model: ItemVariation,
-        as: "Variations",
-        include: { model: Inventory, as: "Inventory" },
-        required: true,
-        attributes: ["id", "name", "colors", "placing"]
-      },
-      {
-        model: Inventory,
-        as: "Inventory"
-      }
+      { model: Inventory, as: "Inventory" }
     ],
     where: {
       [Op.or]: cart.map(i => ({
-        id: i.itemId
+        [Op.and]: {
+          id: i.variationId,
+          itemId: i.itemId
+        }
       }))
     }
   });
   if (seqCartItemsDetail.length < 1 || seqCartItemsDetail.length !== cart.length) {
-    throw new HttpError(...ERRORS.INVALID.ITEM);
+    throw new HttpError(...ERRORS.INVALID.ITEMVARIATION);
   }
-  // "Finalizing" items
+  // "Finalizing" item of cart items detail (item variations)
   let cartItemsDetail = seqCartItemsDetail;
-  cartItemsDetail = cartItemsDetail.map(item => {
-    return getItemFinalization(item, null, null, true); // eslint-disable-line
+  cartItemsDetail = cartItemsDetail.map(varia => {
+    const finalizedItem = getItemFinalization(varia.Item, null, null, true); // eslint-disable-line
+    return {
+      ...varia,
+      Item: finalizedItem
+    };
   });
+
   // Check quantity (based on specified variationId)
   for (let i = 0; i < cartItemsDetail.length; i += 1) {
-    const checkingCartItem = cart.find(cartItem => cartItem.itemId === cartItemsDetail[i].id);
-    const checkingVariation = cartItemsDetail[i].Variations.find(
-      varia => varia.id === checkingCartItem.variationId
+    const checkingCartItem = cart.find(
+      cartItem => cartItem.variationId === cartItemsDetail[i].dataValues.id
     );
-    if (!checkingVariation) {
+    const checkingVariation = cartItemsDetail[i].Item.Variations.find(
+      varia => varia.id === checkingCartItem.variationId
+    ); // NEEDED for Variation.inventorySize
+    if (!checkingCartItem) {
+      // it is ItemVariation
       throw new HttpError(...ERRORS.MISC.ORDER_CARTVARIATION);
     }
     if (checkingVariation.dataValues.inventorySize < checkingCartItem.quantity) {
@@ -471,14 +520,18 @@ const getOrderDetails = async cart => {
 
   // Calculate total payment
   const totalPayment = cartItemsDetail.reduce((finalVal, o) => {
-    return finalVal + o.dataValues.priceSale * cart.find(i => i.itemId === o.id).quantity;
+    return (
+      finalVal +
+      o.Item.dataValues.priceSale * cart.find(i => i.variationId === o.dataValues.id).quantity
+    );
   }, 0);
 
   // get appliedPromotions
-  const appliedPromotions = cartItemsDetail
-    .filter(i => !!i.dataValues.AppliedPromotion)
-    .map(i => i.dataValues.AppliedPromotion.id)
-    .join(",");
+  const appliedPromotions = _.uniq(
+    cartItemsDetail
+      .filter(i => !!i.Item.dataValues.AppliedPromotion)
+      .map(i => i.Item.dataValues.AppliedPromotion.id)
+  ).join(",");
 
   return { orderDetails: cartItemsDetail, totalPayment, appliedPromotions };
 };
