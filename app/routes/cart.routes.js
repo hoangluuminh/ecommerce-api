@@ -14,7 +14,7 @@ const cartListChecks = [
         return false;
       }
       for (let i = 0; i < value.length; i += 1) {
-        if (!_.isEqual(Object.keys(value[i]), ["itemId", "variationId", "quantity"])) {
+        if (!["itemId", "variationId", "quantity"].every(v => Object.keys(value[i]).includes(v))) {
           return false;
         }
       }

@@ -126,8 +126,9 @@ exports.getOrderStatuses = async (req, res, next) => {
 };
 
 // POST: Add POS Order
-exports.addPosOrder = async (req, res, next) => {
-  const actionName = "addPosOrder";
+// POST: Add COD Order
+exports.addCodOrder = async (req, res, next) => {
+  const actionName = "addCodOrder";
   // Validations
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -135,10 +136,15 @@ exports.addPosOrder = async (req, res, next) => {
     return res.status(422).json(errors);
   }
   // Declarations
-  const { userId, billingDetails, loan, cart } = req.body;
+  const { billingDetails, loan, cart } = req.body;
+  // check COD || POS
+  const userId = req.jwtDecoded.data.accountUserId || req.body.userId;
   // Executions
   try {
-    await orderService.addOrder(userId, billingDetails, loan, cart, { isPos: true });
+    await orderService.addOrder(userId, billingDetails, loan, cart, {
+      isCod: req.jwtDecoded.data.accountUserId,
+      isPos: req.body.userId
+    });
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
@@ -146,6 +152,7 @@ exports.addPosOrder = async (req, res, next) => {
       [
         ERRORS.INVALID.ACCOUNTUSER[0],
         ERRORS.INVALID.ITEM[0],
+        ERRORS.INVALID.ITEMVARIATION[0],
         ERRORS.MISC.ORDER_EXCEEDDOWNPAYMENT[0],
         ERRORS.MISC.ORDER_CARTVARIATION[0],
         ERRORS.MISC.ORDER_QUANTITY[0]
@@ -179,6 +186,7 @@ exports.verifyOrder = async (req, res, next) => {
     if (
       [
         ERRORS.INVALID.ORDER[0],
+        ERRORS.DUPLICATE.INVENTORY[0],
         ERRORS.MISC.ORDER_FORBIDDEN[0],
         ERRORS.MISC.INVENTORY_UNAVAILABLE[0],
         ERRORS.MISC.ORDERDETAIL_MISMATCH[0],
@@ -186,6 +194,31 @@ exports.verifyOrder = async (req, res, next) => {
         ERRORS.MISC.INVENTORY_INCORRECTVARIATION[0]
       ].indexOf(error.name) >= 0
     ) {
+      return next(error);
+    }
+    return next(new HttpError(...ERRORS.UNKNOWN.UPDATE));
+  }
+};
+
+// PATCH: Updating Order's status to "Delivering"
+exports.startDeliverOrder = async (req, res, next) => {
+  const actionName = "startDeliverOrder";
+  // Validations
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    getUserReqMsg(`${controllerName}.${actionName}`, errors);
+    return res.status(422).json(errors);
+  }
+  // Declarations
+  // const { accountStaffId } = req.jwtDecoded.data;
+  const { orderId } = req.params;
+  // Executions
+  try {
+    await orderService.startDeliverOrder(orderId);
+    return res.status(200).send();
+  } catch (error) {
+    getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
+    if ([ERRORS.INVALID.ORDER[0], ERRORS.MISC.ORDER_FORBIDDEN[0]].indexOf(error.name) >= 0) {
       return next(error);
     }
     return next(new HttpError(...ERRORS.UNKNOWN.UPDATE));

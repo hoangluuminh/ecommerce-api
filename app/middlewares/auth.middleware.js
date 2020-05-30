@@ -47,7 +47,8 @@ function hasRole(roles) {
   return (req, res, next) => {
     // SHOP
     if (roles.includes("user")) {
-      if (req.jwtDecoded.data.role) {
+      if (req.jwtDecoded.data.role && roles.length === 1) {
+        // user should not have data.role; only end check if "roles" only has "user"
         return next(new HttpError(...ERRORS.AUTH.UNAUTHORIZED));
       } else { // eslint-disable-line
         return next();

@@ -16,7 +16,9 @@ router.post(
   [
     check("billingDetails")
       .custom(value => {
-        if (!_.isEqual(Object.keys(value), ["lastName", "firstName", "email", "phone"])) {
+        if (
+          !["lastName", "firstName", "email", "phone"].every(v => Object.keys(value).includes(v))
+        ) {
           return false;
         }
         return true;
@@ -27,7 +29,7 @@ router.post(
         if (!value) {
           return true;
         }
-        if (!_.isEqual(Object.keys(value), ["downPayment", "loanTerm"])) {
+        if (!["downPayment", "loanTerm"].every(v => Object.keys(value).includes(v))) {
           return false;
         }
         return true;
@@ -42,7 +44,9 @@ router.post(
           return true;
         }
         for (let i = 0; i < value.length; i += 1) {
-          if (!_.isEqual(Object.keys(value[i]), ["itemId", "variationId", "quantity"])) {
+          if (
+            !["itemId", "variationId", "quantity"].every(v => Object.keys(value[i]).includes(v))
+          ) {
             return false;
           }
         }

@@ -35,6 +35,7 @@ exports.startPayment = async (req, res, next) => {
       [
         ERRORS.INVALID.ACCOUNTUSER[0],
         ERRORS.INVALID.ITEM[0],
+        ERRORS.INVALID.ITEMVARIATION[0],
         ERRORS.MISC.ORDER_EXCEEDDOWNPAYMENT[0],
         ERRORS.MISC.ORDER_CARTVARIATION[0],
         ERRORS.MISC.ORDER_QUANTITY[0]

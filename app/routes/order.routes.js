@@ -8,24 +8,24 @@ const { isAuth, hasRole } = require("../middlewares/auth.middleware");
 const orderController = require("../controllers/order.controller");
 
 const orderInfoChecks = [
-  check("userId")
-    .not()
-    .isEmpty()
-    .withMessage("Required."),
   check("billingDetails")
     .custom(value => {
-      if (!_.isEqual(Object.keys(value), ["lastName", "firstName", "email", "phone"])) {
+      if (
+        !["lastName", "firstName", "email", "phone", "address"].every(v =>
+          Object.keys(value).includes(v)
+        )
+      ) {
         return false;
       }
       return true;
     })
-    .withMessage("Billing Details must include name, email, phone"),
+    .withMessage("Billing Details must include name, email, phone, address"),
   check("loan")
     .custom(value => {
       if (!value) {
         return true;
       }
-      if (!_.isEqual(Object.keys(value), ["downPayment", "loanTerm"])) {
+      if (!["downPayment", "loanTerm"].every(v => Object.keys(value).includes(v))) {
         return false;
       }
       return true;
@@ -40,7 +40,7 @@ const orderInfoChecks = [
         return true;
       }
       for (let i = 0; i < value.length; i += 1) {
-        if (!_.isEqual(Object.keys(value[i]), ["itemId", "variationId", "quantity"])) {
+        if (!["itemId", "variationId", "quantity"].every(v => Object.keys(value[i]).includes(v))) {
           return false;
         }
       }
@@ -90,7 +90,22 @@ router.get("/statuses", isAuth, orderController.getOrderStatuses);
 router.get("/:orderId", orderController.getOrder);
 
 // POST: Add POS Order
-router.post("/", isAuth, hasRole(["merchandiser"]), orderInfoChecks, orderController.addPosOrder);
+router.post(
+  "/pos",
+  isAuth,
+  hasRole(["merchandiser"]),
+  orderInfoChecks,
+  [
+    check("userId")
+      .not()
+      .isEmpty()
+      .withMessage("Required.")
+  ],
+  orderController.addCodOrder
+);
+
+// POST: Add COD Order
+router.post("/", isAuth, hasRole(["user"]), orderInfoChecks, orderController.addCodOrder);
 
 // PATCH: Verify Order (select inventory item)
 router.patch(
@@ -107,15 +122,27 @@ router.patch(
           return true;
         }
         for (let i = 0; i < value.length; i += 1) {
-          if (!_.isEqual(Object.keys(value[i]), ["variationId", "inventoryId"])) {
+          if (!["id", "inventoryId"].every(v => Object.keys(value[i]).includes(v))) {
+            return false;
+          }
+          // custom
+          if (!(typeof value[i].id === "number")) {
             return false;
           }
         }
         return true;
       })
-      .withMessage("All item must include variationId and inventoryId.")
+      .withMessage("All order details must include id and inventory item.")
   ],
   orderController.verifyOrder
+);
+
+// PATCH: Updating Order's status to "Delivering"
+router.patch(
+  "/:orderId/deliver",
+  isAuth,
+  hasRole(["merchandiser"]),
+  orderController.startDeliverOrder
 );
 
 // PATCH: Updating Order's status to "Delivered"
