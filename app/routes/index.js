@@ -18,10 +18,10 @@ const scaleRoutes = require("./scale.routes");
 const typeRoutes = require("./type.routes");
 const makerRoutes = require("./maker.routes");
 const brandRoutes = require("./brand.routes");
-
 const inventoryRoutes = require("./inventory.routes");
 const shopRoutes = require("./shop.routes");
 const orderRoutes = require("./order.routes");
+const promotionRoutes = require("./promotion.routes");
 
 // MIDDLEWARES
 router.use(authSetup); // setup for req.authFor
@@ -42,9 +42,9 @@ router.use("/scales", scaleRoutes);
 router.use("/types", typeRoutes);
 router.use("/makers", makerRoutes);
 router.use("/brands", brandRoutes);
-
 router.use("/inventories", inventoryRoutes);
 router.use("/shop", shopRoutes);
 router.use("/orders", orderRoutes);
+router.use("/promotions", promotionRoutes);
 
 module.exports = router;
