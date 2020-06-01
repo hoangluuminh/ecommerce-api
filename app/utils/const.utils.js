@@ -25,12 +25,7 @@ exports.ERRORS = {
     SHOP: ["InvalidShopError", "Specified shop cannot be found", 400],
     ORDER: ["InvalidOrderError", "Specified order cannot be found", 400],
     ORDERSTATUS: ["InvalidOrderStatusError", "Specified order status cannot be found", 400],
-    // ITEMIMG: ["InvalidItemImgError", "Cannot find image", 400],
-    // ITEMIMGS: ["InvalidItemImgsError", "Cannot find images", 400],
-    // BRAND: ["InvalidBrandError", "Specified brand cannot be found", 400],
-    // BRANDS: ["InvalidBrandsError", "One of the specified brands cannot be found", 400],
-    // BRAND_PARENT: ["InvalidParentBrandError", "Specified parent brand cannot be found", 400],
-    // CATEGORY: ["InvalidCategoryError", "Specified category cannot be found", 400],
+    PROMOTION: ["InvalidPromotionError", "Specified promotion cannot be found", 400],
     //
     ACCOUNTUSER: ["InvalidAccountUserError", "Specified user cannot be found", 400],
     ACCOUNTSTAFF: ["InvalidAccountStaffError", "Specified staff cannot be found", 400],
@@ -39,9 +34,6 @@ exports.ERRORS = {
   },
   DUPLICATE: {
     INVENTORY: ["DuplicateInventoryError", "Found duplication of Inventory Item IDs", 400]
-    // ITEMIMGURL: ["DuplicateItemImgURLError", "Image with specified URL already exists", 400],
-    // BRAND: ["DuplicateBrandError", "Brand with specified id already exists", 400],
-    // CATEGORY: ["DuplicateCategoryError", "Category with specified id already exists", 400]
   },
   UNIQUE: {
     USER_USERNAME: ["UniqueUserUsernameError", "Username already exists", 400],
@@ -52,7 +44,8 @@ exports.ERRORS = {
     MAKER: ["UniqueMakerError", "Maker already exists", 400],
     BRAND: ["UniqueBrandError", "Brand already exists", 400],
     ATTRIBUTE: ["DuplicateAttributeError", "Attribute already exists", 400],
-    INVENTORY: ["UniqueInventoryError", "One of the provided indentifiers already exists", 400]
+    INVENTORY: ["UniqueInventoryError", "One of the provided indentifiers already exists", 400],
+    PROMOTION: ["DuplicatePromotionError", "Promotion already exists", 400]
   },
   AUTH: {
     UNAUTHENTICATED: ["AuthUnauthenticatedError", "Unauthenticated", 401],
@@ -108,8 +101,6 @@ exports.ERRORS = {
       "Supplied Order details and saved Order details have Variations mismatch.",
       400
     ]
-    // BRANDS_PARENTING: ["BrandsParentingError", "The brands belong to different parents", 400],
-    // BRANDS_UNDELETABLEPARENT: ["UndeletableParentBrandError", "You cannot delete parent brand", 400]
   },
   UNKNOWN: {
     GET: ["UnknownGetError", "Retrieving unsuccessful. Please try again later", 500],
