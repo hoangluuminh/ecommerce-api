@@ -7,6 +7,10 @@ module.exports = (Sequelize, sequelize) => {
         primaryKey: true,
         allowNull: false
       },
+      paymentIntentId: {
+        type: Sequelize.STRING(50),
+        allowNull: true
+      },
       userId: {
         type: Sequelize.STRING(50),
         allowNull: false
