@@ -241,7 +241,7 @@ exports.addOrder = async (userId, billingDetails, loan, cart, options) => {
     totalPayment = financedAmount + parseInt(loan.downPayment, 10);
   }
   // Executions
-  const orderId = _orderId || generateId({ isOrderId: true });
+  const orderId = _orderId || generateId();
   db.sequelize.transaction(async t => {
     await Order.create(
       {

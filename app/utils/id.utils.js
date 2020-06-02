@@ -1,13 +1,6 @@
 const shortid = require("shortid");
 
-const generateId = options => {
-  let isOrderId = null;
-  if (options) {
-    isOrderId = options.isOrderId;
-  }
-  if (isOrderId) {
-    shortid.characters("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-~");
-  }
+const generateId = () => {
   return shortid.generate();
 };
 module.exports = generateId;

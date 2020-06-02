@@ -17,13 +17,15 @@ router.post(
     check("billingDetails")
       .custom(value => {
         if (
-          !["lastName", "firstName", "email", "phone"].every(v => Object.keys(value).includes(v))
+          !["lastName", "firstName", "email", "phone", "address"].every(v =>
+            Object.keys(value).includes(v)
+          )
         ) {
           return false;
         }
         return true;
       })
-      .withMessage("Billing Details must include name, email, phone"),
+      .withMessage("Billing Details must include name, email, phone, address"),
     check("loan")
       .custom(value => {
         if (!value) {
