@@ -1,5 +1,4 @@
 const express = require("express");
-const _ = require("lodash");
 
 const router = express.Router();
 const { check } = require("express-validator");
@@ -77,5 +76,8 @@ router.delete(
   ],
   cartController.deleteItemFromCart
 );
+
+// DELETE: Clear user's cart
+router.delete("/clear", isAuth, cartController.clearMeCart);
 
 module.exports = router;

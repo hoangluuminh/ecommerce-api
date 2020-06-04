@@ -479,7 +479,7 @@ exports.deleteItem = async id => {
 /* ---------- */
 /* UTILITIES (that should have gone into item.util idk why i do this haha) */
 
-const getItemPreparation = async attributes => {
+const getItemPreparation = async (attributes, options) => {
   // ItemAttributes Processing
   let fetchedAttributes = [];
   let attributeConditions = db.sequelize.literal("1=1");
@@ -577,6 +577,16 @@ const getItemPreparation = async attributes => {
     });
   }
 
+  // Whitelisting & Blacklisting
+  if (options && options.whitelist) {
+    const { whitelist } = options;
+    _.remove(includes, includeModel => !whitelist.includes(includeModel.as));
+  }
+  if (options && options.blacklist) {
+    const { blacklist } = options;
+    _.remove(includes, includeModel => blacklist.includes(includeModel.as));
+  }
+
   // Results
   return [includes];
 };
@@ -630,7 +640,7 @@ const getItemFinalization = (item, attributes, variationName, keepAttr) => {
   // Remove itemAttributes (only used for comparing, filtering)
   newItem.dataValues.ItemAttributes = null;
   // Merge attribute and its unit
-  if (!keepAttr) {
+  if (!keepAttr && !!item.Attributes) {
     const oldAttributes = item.Attributes;
     oldAttributes.forEach(oAttr => {
       const updatingAttrUnit = oldAttributes.find(a => a.id === `${oAttr.id}-unit`);

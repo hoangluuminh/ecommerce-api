@@ -176,3 +176,24 @@ exports.deleteItemFromCart = async (req, res, next) => {
     return next(new HttpError(...ERRORS.UNKNOWN.DELETE));
   }
 };
+
+// DELETE: Clear user's cart
+exports.clearMeCart = async (req, res, next) => {
+  const actionName = "clearMeCart";
+  // Validations
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    getUserReqMsg(`${controllerName}.${actionName}`, errors);
+    return res.status(422).json(errors);
+  }
+  // Declarations
+  const { id: accountId } = req.jwtDecoded.data;
+  // Executions
+  try {
+    await cartService.clearMeCart(accountId);
+    return res.status(200).send();
+  } catch (error) {
+    getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
+    return next(new HttpError(...ERRORS.UNKNOWN.DELETE));
+  }
+};

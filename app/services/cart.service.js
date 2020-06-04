@@ -14,7 +14,9 @@ const getCartDetails = async cartList => {
     return [];
   }
   const { filteredCartList } = await filterCartList(cartList); // eslint-disable-line
-  const [includes] = await getItemPreparation();
+  const [includes] = await getItemPreparation(null, {
+    blacklist: ["Attributes", "ItemAttributes"]
+  });
   const fetchedItems = await Item.findAll({
     include: includes,
     where: {
@@ -113,7 +115,9 @@ exports.performInteractCart = async (accountId, itemId, variationId, quantity, c
   /* accountId available if /add (me); cart available if /add-local (anonymous) */
   const { action } = options;
   // Validations
-  const [includes] = await getItemPreparation();
+  const [includes] = await getItemPreparation(null, {
+    whitelist: ["Inventory", "Variations", "PromotionItems"]
+  });
   const existingItem = await Item.findOne({ include: includes, where: { id: itemId } });
   if (!existingItem) {
     throw new HttpError(...ERRORS.INVALID.ITEM);
@@ -174,10 +178,24 @@ exports.deleteItemFromCart = async (accountId, itemId, variationId) => {
   return true;
 };
 
+exports.clearMeCart = async accountId => {
+  // Establish Redis connection
+  const redisClient = redisService.redisClientInit();
+  const storedUserRedis = await redisClient.get(accountId).then(val => JSON.parse(val) || null);
+  let storedCartList = (storedUserRedis && storedUserRedis.cart) || [];
+  // Executions
+  storedCartList = [];
+  await redisClient.set(accountId, JSON.stringify({ ...storedUserRedis, cart: storedCartList }));
+
+  return true;
+};
+
 /* UTILITIES */
 const filterCartList = async cartList => {
   // Filter invalid itemId
-  const [includes] = await getItemPreparation();
+  const [includes] = await getItemPreparation(null, {
+    whitelist: ["PromotionItems", "Variations"]
+  });
   const filteredItems = await Item.findAll({
     include: includes,
     where: {
