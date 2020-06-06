@@ -2,7 +2,7 @@ const _ = require("lodash");
 
 const db = require("../models");
 
-const { Op, fn, col } = db.Sequelize;
+const { Op } = db.Sequelize;
 const {
   order: Order,
   orderDetail: OrderDetail,

@@ -25,6 +25,7 @@ const inventory = require("./inventory");
 const staffRole = require("./staffRole");
 const orderStatus = require("./orderStatus");
 const supportTicket = require("./supportTicket");
+const supportTicketStatus = require("./supportTicketStatus");
 const supportType = require("./supportType");
 const type = require("./type");
 const userFavItem = require("./userFavItem");
@@ -66,6 +67,7 @@ const db = {
   staffRole: staffRole(Sequelize, sequelize),
   orderStatus: orderStatus(Sequelize, sequelize),
   supportTicket: supportTicket(Sequelize, sequelize),
+  supportTicketStatus: supportTicketStatus(Sequelize, sequelize),
   supportType: supportType(Sequelize, sequelize),
   type: type(Sequelize, sequelize),
   userFavItem: userFavItem(Sequelize, sequelize),
@@ -81,7 +83,7 @@ db.accountStaff.belongsTo(db.account, { as: "Account", foreignKey: "accountId" }
 db.accountStaff.belongsTo(db.staffRole, { as: "Role", foreignKey: "roleId" });
 db.accountStaff.hasMany(db.order, { as: "Orders", foreignKey: "verifier" });
 db.accountStaff.hasMany(db.supportTicket, {
-  as: "Tickets",
+  as: "SupportTickets",
   foreignKey: "support"
 });
 
@@ -154,10 +156,6 @@ db.order.belongsTo(db.accountUser, { as: "Customer", foreignKey: "userId" });
 db.order.belongsTo(db.accountStaff, { as: "Verifier", foreignKey: "verifier" });
 db.order.belongsTo(db.orderStatus, { as: "Status", foreignKey: "statusId" });
 db.order.hasMany(db.orderDetail, { as: "Items", foreignKey: "orderId", onDelete: "CASCADE" });
-db.order.hasMany(db.supportTicket, {
-  as: "SupportTickets",
-  foreignKey: "orderId"
-});
 db.order.hasMany(db.orderPayment, {
   as: "OrderPayments",
   foreignKey: "orderId"
@@ -190,9 +188,12 @@ db.scale.hasMany(db.item, { as: "Items", foreignKey: "scaleId" });
 
 db.staffRole.hasMany(db.accountStaff, { as: "Staffs", foreignKey: "roleId" });
 
+db.supportTicket.belongsTo(db.supportType, { as: "SupportType", foreignKey: "supportTypeId" });
 db.supportTicket.belongsTo(db.accountStaff, { as: "Support", foreignKey: "support" });
 db.supportTicket.belongsTo(db.accountUser, { as: "Customer", foreignKey: "customer" });
-db.supportTicket.belongsTo(db.order, { as: "Order", foreignKey: "orderId" });
+db.supportTicket.belongsTo(db.supportTicketStatus, { as: "Status", foreignKey: "statusId" });
+
+db.supportTicketStatus.hasMany(db.supportTicket, { as: "SupportTickets", foreignKey: "statusId" });
 
 db.supportType.hasMany(db.supportTicket, {
   as: "SupportTickets",

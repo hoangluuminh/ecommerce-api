@@ -28,14 +28,14 @@ router.get("/meInfo", isAuth, hasRole(["user"]), accountUserController.getMeAcco
 router.get(
   "/:accountUserId",
   isAuth,
-  hasRole(["admin", "manager", "merchandiser"]),
+  hasRole(["admin", "manager", "merchandiser", "support"]),
   accountUserController.getAccountUser
 );
 
 router.get(
   "/",
   isAuth,
-  hasRole(["admin", "manager", "merchandiser"]),
+  hasRole(["admin", "manager", "merchandiser", "support"]),
   [
     query("query").optional(),
     query("page")

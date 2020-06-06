@@ -3,12 +3,12 @@ module.exports = (Sequelize, sequelize) => {
     "Item",
     {
       id: {
-        type: Sequelize.STRING(50),
+        type: Sequelize.STRING(255),
         primaryKey: true,
         allowNull: false
       },
       name: {
-        type: Sequelize.STRING(50),
+        type: Sequelize.STRING(255),
         allowNull: false
       },
       scaleId: {
