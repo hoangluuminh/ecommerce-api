@@ -14,14 +14,14 @@ router.get("/roles", isAuth, hasRole(manageRoles), accountStaffController.getSta
 router.get(
   "/:accountStaffId",
   isAuth,
-  hasRole(["admin", "manager", "merchandiser"]),
+  hasRole(["admin", "manager", "merchandiser", "support"]),
   accountStaffController.getAccountStaff
 );
 
 router.get(
   "/",
   isAuth,
-  hasRole(["admin", "manager", "merchandiser"]),
+  hasRole(["admin", "manager", "merchandiser", "support"]),
   [
     query("query").optional(),
     query("page")

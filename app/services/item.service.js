@@ -121,6 +121,7 @@ exports.getItems = async (
       // query
       {
         [Op.or]: {
+          id: { [Op.substring]: query },
           name: { [Op.substring]: query }
         }
       },

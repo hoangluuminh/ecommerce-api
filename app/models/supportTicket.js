@@ -13,22 +13,22 @@ module.exports = (Sequelize, sequelize) => {
       },
       support: {
         type: Sequelize.STRING(50),
-        allowNull: false
+        allowNull: true
       },
       customer: {
         type: Sequelize.STRING(50),
         allowNull: false
       },
-      orderId: {
+      statusId: {
         type: Sequelize.STRING(50),
         allowNull: false
+      },
+      orderId: {
+        type: Sequelize.STRING(50),
+        allowNull: true
       },
       note: {
         type: Sequelize.TEXT,
-        allowNull: false
-      },
-      status: {
-        type: Sequelize.STRING(50),
         allowNull: false
       }
     },

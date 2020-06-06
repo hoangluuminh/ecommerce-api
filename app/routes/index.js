@@ -22,6 +22,7 @@ const inventoryRoutes = require("./inventory.routes");
 const shopRoutes = require("./shop.routes");
 const orderRoutes = require("./order.routes");
 const promotionRoutes = require("./promotion.routes");
+const supportRoutes = require("./support.routes");
 
 // MIDDLEWARES
 router.use(authSetup); // setup for req.authFor
@@ -46,5 +47,6 @@ router.use("/inventories", inventoryRoutes);
 router.use("/shop", shopRoutes);
 router.use("/orders", orderRoutes);
 router.use("/promotions", promotionRoutes);
+router.use("/support", supportRoutes);
 
 module.exports = router;

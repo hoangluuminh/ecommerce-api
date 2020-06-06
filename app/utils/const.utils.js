@@ -26,6 +26,13 @@ exports.ERRORS = {
     ORDER: ["InvalidOrderError", "Specified order cannot be found", 400],
     ORDERSTATUS: ["InvalidOrderStatusError", "Specified order status cannot be found", 400],
     PROMOTION: ["InvalidPromotionError", "Specified promotion cannot be found", 400],
+    SUPPORTTICKET: ["InvalidSupportTicketError", "Specified support ticket cannot be found", 400],
+    SUPPORTTYPE: ["InvalidSupportTypeError", "Specified support type cannot be found", 400],
+    SUPPORTTICKETSTATUS: [
+      "InvalidSupportTicketStatusError",
+      "Specified support ticket's status cannot be found",
+      400
+    ],
     //
     ACCOUNTUSER: ["InvalidAccountUserError", "Specified user cannot be found", 400],
     ACCOUNTSTAFF: ["InvalidAccountStaffError", "Specified staff cannot be found", 400],
@@ -45,7 +52,8 @@ exports.ERRORS = {
     BRAND: ["UniqueBrandError", "Brand already exists", 400],
     ATTRIBUTE: ["DuplicateAttributeError", "Attribute already exists", 400],
     INVENTORY: ["UniqueInventoryError", "One of the provided indentifiers already exists", 400],
-    PROMOTION: ["DuplicatePromotionError", "Promotion already exists", 400]
+    PROMOTION: ["DuplicatePromotionError", "Promotion already exists", 400],
+    SUPPORTTICKET: ["DuplicateSupportTicketError", "Support Ticket already exists", 400]
   },
   AUTH: {
     UNAUTHENTICATED: ["AuthUnauthenticatedError", "Unauthenticated", 401],
