@@ -2,11 +2,12 @@ const _ = require("lodash");
 
 const db = require("../models");
 
-const { Op, fn, col } = db.Sequelize;
+const { Op } = db.Sequelize;
 const { inventory: Inventory, item: Item, itemVariation: ItemVariation } = db;
 
 const HttpError = require("../models/classes/http-error");
 const { ERRORS } = require("../utils/const.utils");
+const generateId = require("../utils/id.utils");
 
 // GET: List of inventories
 exports.getInventories = async (query, page, size, sort, sortDesc, itemId) => {
@@ -93,41 +94,55 @@ exports.getInventory = async inventoryId => {
 };
 
 // POST: Add Inventories
-exports.addInventories = async (itemId, variationId, identifiers) => {
-  // Validations
-  const existingItem = await Item.findOne({ where: { id: itemId } });
-  if (!existingItem) {
-    throw new HttpError(...ERRORS.INVALID.ITEM);
-  }
-  const existingVariation = await ItemVariation.findOne({ where: { id: variationId } });
-  if (!existingVariation) {
-    throw new HttpError(...ERRORS.INVALID.ITEMVARIATION);
-  }
-  if (existingVariation.itemId !== existingItem.id) {
-    throw new HttpError(...ERRORS.MISC.INVENTORY_INCORRECTITEM);
-  }
-  if (identifiers.filter((v, i, self) => self.indexOf(v) === i).length !== identifiers.length) {
-    // Check duplication
-    throw new HttpError(...ERRORS.DUPLICATE.INVENTORY);
-  }
-  const { "count(*)": existingInventoriesCount } = await Inventory.findOne({
-    attributes: [fn("count", col("*"))],
-    raw: true,
+exports.addInventories = async inventories => {
+  // inventories include array of { itemId, variationName, quantity }
+  /* VALIDATIONS */
+  // Get list of distinct itemId, check if they're all valid
+  const uniqItemIds = _.uniq(inventories.map(inv => inv.itemId));
+  const checkingItems = await Item.findAll({
     where: {
-      id: {
-        [Op.or]: identifiers
-      }
+      [Op.or]: uniqItemIds.map(uniqItemId => ({
+        id: uniqItemId
+      }))
     }
   });
-  if (existingInventoriesCount > 0) {
-    throw new HttpError(...ERRORS.UNIQUE.INVENTORY);
+  if (uniqItemIds.length !== checkingItems.length) {
+    throw new HttpError(...ERRORS.INVALID.ITEM);
   }
-  // Executions
+  // Check if all variationName belongs to their corresponding Items
+  // IMPORTANT: (make sure all pairs of itemId and variationName are unique)
+  const correspondingItemVariations = await ItemVariation.findAll({
+    // corresponds to "inventories"
+    where: {
+      [Op.or]: inventories.map(inv => ({
+        [Op.and]: {
+          itemId: inv.itemId,
+          name: inv.variationName
+        }
+      }))
+    }
+  });
+  if (inventories.length !== correspondingItemVariations.length) {
+    throw new HttpError(...ERRORS.MISC.INVENTORY_INCORRECTITEM);
+  }
+  /* EXECUTIONS */
+  const inventoriesFinalized = inventories.reduce((arr, inv) => {
+    const newArr = [...arr];
+    for (let i = 0; i < inv.quantity; i += 1) {
+      newArr.push({
+        itemId: inv.itemId,
+        variationId: correspondingItemVariations.find(
+          varia => varia.itemId === inv.itemId && varia.name === inv.variationName
+        ).id
+      });
+    }
+    return newArr;
+  }, []);
   await Inventory.bulkCreate(
-    identifiers.map(identifier => ({
-      id: identifier,
-      itemId,
-      variationId,
+    inventoriesFinalized.map(inv => ({
+      id: generateId(),
+      itemId: inv.itemId,
+      variationId: inv.variationId,
       available: true,
       bought: false
     }))
