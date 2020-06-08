@@ -2,6 +2,8 @@ const express = require("express");
 
 const router = express.Router();
 const { check, query } = require("express-validator");
+const { isInt } = require("validator");
+const _ = require("lodash");
 
 const { isAuth, hasRole } = require("../middlewares/auth.middleware");
 const inventoryController = require("../controllers/inventory.controller");
@@ -40,26 +42,46 @@ router.post(
   isAuth,
   hasRole(["manager"]),
   [
-    check("itemId")
-      .not()
-      .isEmpty()
-      .withMessage("Required."),
-    check("variationId")
-      .not()
-      .isEmpty()
-      .withMessage("Required."),
-    check("identifiers")
+    check("inventories")
       .isArray({ min: 1 })
-      .withMessage("At least 1 identifier is required."),
-    check("identifiers")
+      .withMessage("At least 1 row of item is required."),
+    check("inventories")
       .custom(value => {
         if (!value || !Array.isArray(value)) {
-          return true;
+          return false;
         }
-        const checkArr = value.filter(v => !v.includes(".") && !v.includes("/"));
-        return checkArr.length === value.length;
+        for (let i = 0; i < value.length; i += 1) {
+          if (
+            !["itemId", "variationName", "quantity"].every(v => Object.keys(value[i]).includes(v))
+          ) {
+            return false;
+          }
+        }
+        return true;
       })
-      .withMessage("All identifiers must have no special characters.")
+      .withMessage("All item must include itemId, variationName and quantity."),
+    check("inventories")
+      .custom(value => {
+        for (let i = 0; i < value.length; i += 1) {
+          if (!(isInt(value[i].quantity.toString()) && value[i].quantity >= 1)) {
+            return false;
+          }
+        }
+        return true;
+      })
+      .withMessage("Quantity must be a number and >= 1."),
+    check("inventories")
+      .custom(value => {
+        const uniqInvs = _.uniqWith(
+          value.map(inv => ({
+            itemId: inv.itemId,
+            variationName: inv.variationName
+          })),
+          _.isEqual
+        );
+        return uniqInvs.length === value.length;
+      })
+      .withMessage("Pair of itemId and variationName must be unique.")
   ],
   inventoryController.addInventories
 );
