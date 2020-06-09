@@ -63,3 +63,19 @@ function hasRole(roles) {
   };
 }
 exports.hasRole = hasRole;
+
+exports.getJwtDecoded = async (req, res, next) => {
+  // const actionName = "getJwtDecoded";
+  const accessTokenFromClient = req.cookies[cookieNames(req).accessToken];
+  const refreshTokenFromClient = req.cookies[cookieNames(req).refreshToken];
+  if (!accessTokenFromClient || !refreshTokenFromClient) {
+    return next();
+  }
+  try {
+    const decoded = await jwtUtils.verifyToken(accessTokenFromClient, accessTokenSecret);
+    req.jwtDecoded = decoded;
+    return next();
+  } catch (error) {
+    return next();
+  }
+};

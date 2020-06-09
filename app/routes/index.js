@@ -24,6 +24,9 @@ const orderRoutes = require("./order.routes");
 const promotionRoutes = require("./promotion.routes");
 const supportRoutes = require("./support.routes");
 
+const userFavItemRoutes = require("./userFavItem.routes");
+const itemCommentRoutes = require("./itemComment.routes");
+
 // MIDDLEWARES
 router.use(authSetup); // setup for req.authFor
 
@@ -48,5 +51,8 @@ router.use("/shop", shopRoutes);
 router.use("/orders", orderRoutes);
 router.use("/promotions", promotionRoutes);
 router.use("/support", supportRoutes);
+
+router.use("/favorite", userFavItemRoutes);
+router.use("/comment", itemCommentRoutes);
 
 module.exports = router;

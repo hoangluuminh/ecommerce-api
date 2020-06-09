@@ -84,7 +84,12 @@ exports.getItem = async (req, res, next) => {
   const { silent, keepAttr } = req.query;
   // Executions
   try {
-    const item = await itemService.getItem(itemId, silent, keepAttr);
+    const item = await itemService.getItem(
+      itemId,
+      silent,
+      keepAttr,
+      req.jwtDecoded ? req.jwtDecoded.data.accountUserId || null : null
+    );
     return res.json({ item });
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);

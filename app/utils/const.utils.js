@@ -33,6 +33,7 @@ exports.ERRORS = {
       "Specified support ticket's status cannot be found",
       400
     ],
+    ITEMCOMMENT: ["InvalidItemCommentError", "Specified item comment cannot be found", 400],
     //
     ACCOUNTUSER: ["InvalidAccountUserError", "Specified user cannot be found", 400],
     ACCOUNTSTAFF: ["InvalidAccountStaffError", "Specified staff cannot be found", 400],
@@ -107,6 +108,11 @@ exports.ERRORS = {
     ORDERDETAIL_MISMATCH: [
       "OrderDetailMismatchError",
       "Supplied Order details and saved Order details have Variations mismatch.",
+      400
+    ],
+    ITEMCOMMENT_UNOWNED: [
+      "ItemCommentUnownedError",
+      "You must purchase this item in order to leave a review",
       400
     ]
   },
