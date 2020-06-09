@@ -188,7 +188,7 @@ exports.performUserSignUp = async (
 };
 
 // PUT: Update user info (excluding password)
-exports.updateUserInfo = async (id, lastName, firstName, phone, gender, birthday) => {
+exports.updateUserInfo = async (id, lastName, firstName, phone, gender, birthday, address) => {
   // Validation
   const account = await Account.findOne({
     include: [
@@ -207,7 +207,7 @@ exports.updateUserInfo = async (id, lastName, firstName, phone, gender, birthday
   }
   // Executions
   await UserInfo.update(
-    { lastName, firstName, phone, gender, birthday },
+    { lastName, firstName, phone, gender, birthday, address },
     { where: { userId: id } }
   );
   return true;

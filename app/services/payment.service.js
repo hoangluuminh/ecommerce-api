@@ -3,7 +3,7 @@ const stripe = require("../configs/stripe.config");
 
 const { order: Order, orderPayment: OrderPayment } = db;
 
-const { addOrder } = require("./order.service");
+const orderService = require("./order.service");
 const HttpError = require("../models/classes/http-error");
 const { ERRORS } = require("../utils/const.utils");
 const generateId = require("../utils/id.utils");
@@ -17,8 +17,13 @@ exports.startPayment = async (userId, billingDetails, loan, cart) => {
   // eslint-disable-next-line
   try {
     // Add order
-    const result = await addOrder(userId, billingDetails, loan, cart, { orderId, isPos: false });
+    const result = await orderService.addOrder(userId, billingDetails, loan, cart, {
+      orderId,
+      isPos: false
+    });
     totalPayment = result.totalPayment;
+    // Cart Validation
+    await orderService.assignInventoryItemsToOrderDetails(orderId, { validateOnly: true });
   } catch (e) {
     throw e;
   }
@@ -38,6 +43,9 @@ exports.startPayment = async (userId, billingDetails, loan, cart) => {
 
 exports.chargedPayment = async paymentIntentId => {
   const order = await Order.findOne({ where: { paymentIntentId } });
+  /* STEP 1: Assign Inventory Items to OrderDetails */
+  await orderService.assignInventoryItemsToOrderDetails(order.id);
+  /* STEP 2: Update Order's status and OrderPayment */
   db.sequelize.transaction(async t => {
     await Order.update({ statusId: "ordered" }, { where: { paymentIntentId } }, { transaction: t });
     await OrderPayment.update(
@@ -72,20 +80,10 @@ exports.chargedPayment = async paymentIntentId => {
 };
 
 exports.rejectPayment = async paymentIntentId => {
-  const orderId = paymentIntentId.split("_")[1];
-  await Order.update({ statusId: "rejected" }, { where: { id: orderId } });
+  await Order.update({ statusId: "rejected" }, { where: { paymentIntentId } });
+  // const order = Order.findOne({ where: { paymentIntentId } });
   try {
-    await stripe.paymentIntents.cancel(paymentIntentId);
-    return true;
-  } catch (e) {
-    throw new HttpError(...ERRORS.UNKNOWN.PAYMENT);
-  }
-};
-
-exports.cancelPayment = async paymentIntentId => {
-  const orderId = paymentIntentId.split("_")[1];
-  await Order.update({ statusId: "canceled" }, { where: { id: orderId } });
-  try {
+    // await cancelOrder(order.id);
     await stripe.paymentIntents.cancel(paymentIntentId);
     return true;
   } catch (e) {

@@ -38,7 +38,14 @@ exports.startPayment = async (req, res, next) => {
         ERRORS.INVALID.ITEMVARIATION[0],
         ERRORS.MISC.ORDER_EXCEEDDOWNPAYMENT[0],
         ERRORS.MISC.ORDER_CARTVARIATION[0],
-        ERRORS.MISC.ORDER_QUANTITY[0]
+        ERRORS.MISC.ORDER_QUANTITY[0],
+        // assignInventoryItemsToOrderDetails
+        ERRORS.INVALID.ORDER[0],
+        ERRORS.DUPLICATE.INVENTORY[0],
+        ERRORS.MISC.ORDER_FORBIDDEN[0],
+        ERRORS.MISC.INVENTORY_UNAVAILABLE[0],
+        ERRORS.MISC.ORDERDETAIL_MISMATCH[0],
+        ERRORS.MISC.INVENTORY_INCORRECTVARIATION[0]
       ].indexOf(error.name) >= 0
     ) {
       return next(error);

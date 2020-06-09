@@ -4,6 +4,7 @@ const { getUserReqMsg, getDatabaseInteractMsg } = require("../utils/logging.util
 const { paginationInfo } = require("../utils/pagination.utils");
 const { ERRORS } = require("../utils/const.utils");
 const HttpError = require("../models/classes/http-error");
+const generateId = require("../utils/id.utils");
 
 const orderService = require("../services/order.service");
 
@@ -141,10 +142,13 @@ exports.addCodOrder = async (req, res, next) => {
   const userId = req.jwtDecoded.data.accountUserId || req.body.userId;
   // Executions
   try {
+    const orderId = generateId();
     await orderService.addOrder(userId, billingDetails, loan, cart, {
+      orderId,
       isCod: req.jwtDecoded.data.accountUserId,
       isPos: req.body.userId
     });
+    await orderService.assignInventoryItemsToOrderDetails(orderId);
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
@@ -155,7 +159,14 @@ exports.addCodOrder = async (req, res, next) => {
         ERRORS.INVALID.ITEMVARIATION[0],
         ERRORS.MISC.ORDER_EXCEEDDOWNPAYMENT[0],
         ERRORS.MISC.ORDER_CARTVARIATION[0],
-        ERRORS.MISC.ORDER_QUANTITY[0]
+        ERRORS.MISC.ORDER_QUANTITY[0],
+        // assignInventoryItemsToOrderDetails
+        ERRORS.INVALID.ORDER[0],
+        ERRORS.DUPLICATE.INVENTORY[0],
+        ERRORS.MISC.ORDER_FORBIDDEN[0],
+        ERRORS.MISC.INVENTORY_UNAVAILABLE[0],
+        ERRORS.MISC.ORDERDETAIL_MISMATCH[0],
+        ERRORS.MISC.INVENTORY_INCORRECTVARIATION[0]
       ].indexOf(error.name) >= 0
     ) {
       return next(error);
@@ -164,7 +175,7 @@ exports.addCodOrder = async (req, res, next) => {
   }
 };
 
-// PATCH: Verify Order (select inventory item)
+// PATCH: Updating Order's status to "Verified"
 exports.verifyOrder = async (req, res, next) => {
   const actionName = "verifyOrder";
   // Validations
@@ -176,22 +187,17 @@ exports.verifyOrder = async (req, res, next) => {
   // Declarations
   const { accountStaffId } = req.jwtDecoded.data;
   const { orderId } = req.params;
-  const { orderDetails } = req.body;
   // Executions
   try {
-    await orderService.verifyOrder(orderId, orderDetails, accountStaffId);
+    await orderService.verifyOrder(orderId, accountStaffId);
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
     if (
       [
         ERRORS.INVALID.ORDER[0],
-        ERRORS.DUPLICATE.INVENTORY[0],
         ERRORS.MISC.ORDER_FORBIDDEN[0],
-        ERRORS.MISC.INVENTORY_UNAVAILABLE[0],
-        ERRORS.MISC.ORDERDETAIL_MISMATCH[0],
-        ERRORS.INVALID.ACCOUNTSTAFF[0],
-        ERRORS.MISC.INVENTORY_INCORRECTVARIATION[0]
+        ERRORS.INVALID.ACCOUNTSTAFF[0]
       ].indexOf(error.name) >= 0
     ) {
       return next(error);
@@ -260,14 +266,23 @@ exports.cancelOrder = async (req, res, next) => {
     return res.status(422).json(errors);
   }
   // Declarations
-  // const { accountStaffId } = req.jwtDecoded.data;
+  const { accountStaffId } = req.jwtDecoded.data;
   const { orderId } = req.params;
   // Executions
   try {
-    await orderService.cancelOrder(orderId);
+    await orderService.cancelOrder(orderId, accountStaffId);
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
+    if (
+      [
+        ERRORS.INVALID.ORDER[0],
+        ERRORS.MISC.ORDER_FORBIDDEN[0],
+        ERRORS.INVALID.ACCOUNTSTAFF[0]
+      ].indexOf(error.name) >= 0
+    ) {
+      return next(error);
+    }
     return next(new HttpError(...ERRORS.UNKNOWN.UPDATE));
   }
 };

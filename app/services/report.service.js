@@ -25,6 +25,7 @@ exports.getMonthlySalesReport = async year => {
       [fn("COUNT", col("*")), "count"]
     ],
     where: {
+      statusId: "delivered",
       [Op.and]: [where(db.sequelize.fn("YEAR", col("createdAt")), year)]
     },
     group: [fn("MONTH", col("createdAt"))]
@@ -75,6 +76,7 @@ exports.getProductSalesReport = async (timeStart, timeEnd) => {
     ],
     include: [{ model: Order.scope(null), as: "Order", attributes: [] }],
     where: {
+      "$Order.statusId$": "delivered",
       "$Order.createdAt$": {
         [Op.between]: [timeStart, timeEnd]
       }
@@ -176,6 +178,7 @@ exports.getCategorySalesReport = async (category, timeStart, timeEnd) => {
       }
     ],
     where: {
+      "$Order.statusId$": "delivered",
       "$Order.createdAt$": {
         [Op.between]: [timeStart, timeEnd]
       }

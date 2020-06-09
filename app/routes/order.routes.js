@@ -106,35 +106,8 @@ router.post(
 // POST: Add COD Order
 router.post("/", isAuth, hasRole(["user"]), orderInfoChecks, orderController.addCodOrder);
 
-// PATCH: Verify Order (select inventory item)
-router.patch(
-  "/:orderId/verify",
-  isAuth,
-  hasRole(["merchandiser"]),
-  [
-    check("orderDetails")
-      .isArray({ min: 1 })
-      .withMessage("At least 1 item is required."),
-    check("orderDetails")
-      .custom(value => {
-        if (!value || !Array.isArray(value)) {
-          return true;
-        }
-        for (let i = 0; i < value.length; i += 1) {
-          if (!["id", "inventoryId"].every(v => Object.keys(value[i]).includes(v))) {
-            return false;
-          }
-          // custom
-          if (!(typeof value[i].id === "number")) {
-            return false;
-          }
-        }
-        return true;
-      })
-      .withMessage("All order details must include id and inventory item.")
-  ],
-  orderController.verifyOrder
-);
+// PATCH: Updating Order's status to "Verified"
+router.patch("/:orderId/verify", isAuth, hasRole(["merchandiser"]), orderController.verifyOrder);
 
 // PATCH: Updating Order's status to "Delivering"
 router.patch(
