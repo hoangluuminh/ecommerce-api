@@ -1,10 +1,9 @@
 const express = require("express");
-const _ = require("lodash");
 
 const router = express.Router();
 const { check, query } = require("express-validator");
 
-const { isAuth, hasRole } = require("../middlewares/auth.middleware");
+const { isAuth, hasRole, getJwtDecoded } = require("../middlewares/auth.middleware");
 const itemController = require("../controllers/item.controller");
 
 const itemInfoChecks = [
@@ -113,6 +112,7 @@ router.get("/filterValues", itemController.getItemFilterValues);
 // GET: Product detail
 router.get(
   "/:itemId",
+  getJwtDecoded,
   [
     query("silent")
       .optional()

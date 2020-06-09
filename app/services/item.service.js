@@ -27,6 +27,7 @@ const {
   account: Account
 } = db;
 
+const { isUserFavItem } = require("./userFavItem.service");
 const HttpError = require("../models/classes/http-error");
 const { ERRORS, INT_MAX } = require("../utils/const.utils");
 const generateId = require("../utils/id.utils");
@@ -169,7 +170,7 @@ exports.getItems = async (
 };
 
 // GET: Product detail
-exports.getItem = async (itemId, silent, keepAttr) => {
+exports.getItem = async (itemId, silent, keepAttr, userId) => {
   // Declarations
   const [includes] = await getItemPreparation(); // eslint-disable-line
   const includeOrders = [
@@ -210,6 +211,7 @@ exports.getItem = async (itemId, silent, keepAttr) => {
   /* POST PROCESSING */
   const item = getItemFinalization(seqItem, null, null, keepAttr); // eslint-disable-line
   item.dataValues.rating = _.sum(item.Comments.map(c => c.rating)) / item.Comments.length;
+  item.dataValues.isFavorited = userId ? await isUserFavItem(userId, itemId) : false;
 
   // Additional: one up view count
   if (!silent) {
