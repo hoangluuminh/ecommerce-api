@@ -242,7 +242,7 @@ exports.addOrder = async (userId, billingDetails, loan, cart, options) => {
   }
   // Executions
   const orderId = _orderId || generateId();
-  db.sequelize.transaction(async t => {
+  await db.sequelize.transaction(async t => {
     await Order.create(
       {
         id: orderId,
@@ -302,43 +302,84 @@ exports.addOrder = async (userId, billingDetails, loan, cart, options) => {
     );
   });
 
-  return { orderDetails, totalPayment, appliedPromotions };
+  /* execute assignInventoryItemsToOrderDetails */
+
+  return { orderId, orderDetails, totalPayment, appliedPromotions };
 };
 
-// PATCH: Verify Order (select inventory item)
-exports.verifyOrder = async (orderId, orderDetails, verifier) => {
+// Assigning Inventory Items to OrderDetails of Order
+const assignInventoryItemsToOrderDetails = async (orderId, options) => {
+  // CONTINUATION OF addOrder
+  /* STEP 1: Get orDeWithInventoryIds, explained down below */
+  // Validations
+  const order = await Order.findOne({
+    include: [
+      {
+        model: OrderDetail,
+        as: "Items"
+      }
+    ],
+    where: { id: orderId }
+  });
+  if (!order) {
+    throw new HttpError(...ERRORS.INVALID.ORDER);
+  }
+  const orderDetails = order.Items;
+  // Executions
+  // Get list of Inventory items containing variationId of orderDetails
+  const inventoryItems = await Inventory.findAll({
+    where: {
+      available: true,
+      bought: false,
+      [Op.or]: orderDetails.map(orderDetail => ({
+        [Op.and]: {
+          itemId: orderDetail.item_id,
+          variationId: orderDetail.item_variationId
+        }
+      }))
+    }
+  });
+  // Get list of Inventory items GROUPED BY variationId (hashing)
+  const invItemsGroupedByVaria = inventoryItems.reduce((_groupeds, inv) => {
+    const groupeds = { ..._groupeds };
+    // Get existing hash based on variationId
+    let grouped = groupeds[inv.variationId];
+    if (!grouped) {
+      // If hash of this variationId has not been created at, create it
+      groupeds[inv.variationId] = [];
+      // Reassigning
+      grouped = groupeds[inv.variationId];
+    }
+    // Add new inventoryId into hash
+    grouped.push(inv.id);
+    return groupeds;
+    // [{[inv.variationId]: ["INVENTORYID1", "INVENTORYID2"]}, ...]
+  }, {});
+  // Create new array of ["id", "inventoryId"] called "Order Details with inventoryId attached"
+  const orDeWithInventoryIds = orderDetails.map(orderDetail => ({
+    id: orderDetail.id,
+    // Get inventoryIds list based on hash of self variationId, then pop from the array of hash
+    inventoryId: invItemsGroupedByVaria[orderDetail.item_variationId].pop()
+  }));
+  /* STEP 2: Assigning inventoryItems to OrderDetails */
   // Validations
   const checkingOrder = await Order.findOne({ where: { id: orderId } });
   if (!checkingOrder) {
     throw new HttpError(...ERRORS.INVALID.ORDER);
   }
-  if (_.uniq(orderDetails.map(oD => oD.inventoryId)).length !== orderDetails.length) {
+  if (
+    _.uniq(orDeWithInventoryIds.map(oD => oD.inventoryId)).length !== orDeWithInventoryIds.length
+  ) {
     throw new HttpError(...ERRORS.DUPLICATE.INVENTORY);
-  }
-  if (checkingOrder.statusId !== "ordered") {
-    throw new HttpError(...ERRORS.MISC.ORDER_FORBIDDEN);
-  }
-  const accountStaff = await Account.findOne({
-    include: [
-      {
-        model: AccountStaff,
-        as: "Staff",
-        where: { id: verifier },
-        required: true
-      }
-    ]
-  });
-  if (!accountStaff) {
-    throw new HttpError(...ERRORS.INVALID.ACCOUNTUSER);
   }
   /* orderDetail id check */
   const fetchedOrderDetails = await OrderDetail.findAll({
     where: {
       orderId,
-      [Op.or]: orderDetails.map(oD => ({ id: oD.id }))
+      [Op.or]: orDeWithInventoryIds.map(oD => ({ id: oD.id }))
     }
   });
-  if (fetchedOrderDetails.length !== orderDetails.length) {
+  if (fetchedOrderDetails.length !== orDeWithInventoryIds.length) {
     throw new HttpError(...ERRORS.MISC.ORDERDETAIL_MISMATCH);
   }
   /* inventoryId check */
@@ -355,42 +396,84 @@ exports.verifyOrder = async (orderId, orderDetails, verifier) => {
       }))
     }
   });
-  for (let i = 0; i < orderDetails.length; i += 1) {
-    const fetchedOrderDetail = fetchedOrderDetails.find(oD => oD.id === orderDetails[i].id);
+  for (let i = 0; i < orDeWithInventoryIds.length; i += 1) {
+    const fetchedOrderDetail = fetchedOrderDetails.find(oD => oD.id === orDeWithInventoryIds[i].id);
     const checkingInventoryItems = seqVariations.find(
       varia => varia.id === fetchedOrderDetail.item_variationId
     ).Inventory;
-    if (!checkingInventoryItems.map(inv => inv.id).includes(orderDetails[i].inventoryId)) {
+    if (!checkingInventoryItems.map(inv => inv.id).includes(orDeWithInventoryIds[i].inventoryId)) {
       throw new HttpError(...ERRORS.MISC.INVENTORY_INCORRECTVARIATION);
     }
     const inventoryDetail = checkingInventoryItems.find(
-      inv => inv.id === orderDetails[i].inventoryId
+      inv => inv.id === orDeWithInventoryIds[i].inventoryId
     );
     if (inventoryDetail.available === false || inventoryDetail.bought === true) {
       throw new HttpError(...ERRORS.MISC.INVENTORY_UNAVAILABLE);
     }
   }
-  // Executions
+  // Executions (ONLY WITH options.validateOnly == false)
+  if (options && options.validateOnly === true) {
+    return true;
+  }
   db.sequelize.transaction(async t => {
-    await Order.update({ verifier, statusId: "verified" }, { where: { id: orderId } });
-    for (let i = 0; i < orderDetails.length; i += 1) {
+    // await Order.update({ verifier, statusId: "verified" }, { where: { id: orderId } });
+    for (let i = 0; i < orDeWithInventoryIds.length; i += 1) {
       // eslint-disable-next-line
       await OrderDetail.update(
         {
-          item_inventoryId: orderDetails[i].inventoryId
+          item_inventoryId: orDeWithInventoryIds[i].inventoryId
         },
         {
           where: {
-            id: orderDetails[i].id,
+            id: orDeWithInventoryIds[i].id,
             orderId
           }
         },
         { transaction: t }
       );
       // eslint-disable-next-line
-      await Inventory.update({ bought: true }, { where: { id: orderDetails[i].inventoryId } });
+      await Inventory.update(
+        { bought: true },
+        { where: { id: orDeWithInventoryIds[i].inventoryId } }
+      );
     }
   });
+  return true;
+};
+exports.assignInventoryItemsToOrderDetails = assignInventoryItemsToOrderDetails;
+
+// PATCH: Updating Order's status to "Verified"
+exports.verifyOrder = async (orderId, accountStaffId) => {
+  // Validations
+  const checkingOrder = await Order.findOne({ where: { id: orderId } });
+  if (!checkingOrder) {
+    throw new HttpError(...ERRORS.INVALID.ORDER);
+  }
+  if (checkingOrder.statusId !== "ordered") {
+    throw new HttpError(...ERRORS.MISC.ORDER_FORBIDDEN);
+  }
+  const accountStaff = await Account.findOne({
+    include: [
+      {
+        model: AccountStaff,
+        as: "Staff",
+        where: { id: accountStaffId },
+        required: true
+      }
+    ]
+  });
+  if (!accountStaff) {
+    throw new HttpError(...ERRORS.INVALID.ACCOUNTSTAFF);
+  }
+  // Executions
+  await db.sequelize.transaction(async t => {
+    await Order.update(
+      { statusId: "verified", verifier: accountStaffId },
+      { where: { id: orderId } },
+      { transaction: t }
+    );
+  });
+  return true;
 };
 
 // PATCH: Updating Order's status to "Delivering"
@@ -405,7 +488,7 @@ exports.startDeliverOrder = async orderId => {
   }
   // Executions
   const orderDetails = await OrderDetail.findAll({ where: { orderId } });
-  db.sequelize.transaction(async t => {
+  await db.sequelize.transaction(async t => {
     await Order.update({ statusId: "delivering" }, { where: { id: orderId } }, { transaction: t });
     for (let i = 0; i < orderDetails.length; i += 1) {
       // eslint-disable-next-line
@@ -416,6 +499,7 @@ exports.startDeliverOrder = async orderId => {
       );
     }
   });
+  return true;
 };
 
 // PATCH: Updating Order's status to "Delivered"
@@ -429,25 +513,59 @@ exports.completeOrder = async orderId => {
     throw new HttpError(...ERRORS.MISC.ORDER_FORBIDDEN);
   }
   // Executions
-  db.sequelize.transaction(async t => {
+  await db.sequelize.transaction(async t => {
     await Order.update({ statusId: "delivered" }, { where: { id: orderId } }, { transaction: t });
     // for COD Order, should disable/adjust if dev ever plan to apply LOAN PAYMENT
     await OrderPayment.update({ isPaid: true }, { where: { orderId } }, { transaction: t });
   });
+  return true;
 };
 
 // PATCH: Cancel Order
-exports.cancelOrder = async orderId => {
+exports.cancelOrder = async (orderId, accountStaffId) => {
   // Validations
   const checkingOrder = await Order.findOne({ where: { id: orderId } });
   if (!checkingOrder) {
     throw new HttpError(...ERRORS.INVALID.ORDER);
   }
-  if (checkingOrder.statusId !== "ordered") {
+  if (!["processing", "ordered", "verified", "delivering"].includes(checkingOrder.statusId)) {
     throw new HttpError(...ERRORS.MISC.ORDER_FORBIDDEN);
   }
+  const existingAccountStaff = await Account.findOne({
+    include: [
+      {
+        model: AccountStaff,
+        as: "Staff",
+        where: { id: accountStaffId },
+        required: true
+      }
+    ]
+  });
+  if (!existingAccountStaff) {
+    throw new HttpError(...ERRORS.INVALID.ACCOUNTSTAFF);
+  }
   // Executions
-  await Order.update({ statusId: "canceled" }, { where: { id: orderId } });
+  // await Order.update({ statusId: "canceled" }, { where: { id: orderId } });
+  const orderDetails = await OrderDetail.findAll({ where: { orderId } });
+  await db.sequelize.transaction(async t => {
+    await Order.update(
+      { statusId: "canceled", verifier: accountStaffId },
+      { where: { id: orderId } },
+      { transaction: t }
+    );
+    // Revert inventoryIds assign
+    await OrderDetail.update({ item_inventoryId: null }, { where: { orderId } });
+    for (let i = 0; i < orderDetails.length; i += 1) {
+      // Revert inventori items to original state (before ordering)
+      // eslint-disable-next-line
+      await Inventory.update(
+        { available: true, bought: false },
+        { where: { id: orderDetails[i].item_inventoryId } },
+        { transaction: t }
+      );
+    }
+  });
+  return true;
 };
 
 /* ---------- */

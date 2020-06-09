@@ -125,7 +125,7 @@ exports.updateMeAccountUser = async (req, res, next) => {
   }
   // Declarations
   const { accountUserId } = req.jwtDecoded.data;
-  const { lastName, firstName, phone, gender, birthday } = req.body;
+  const { lastName, firstName, phone, gender, birthday, address } = req.body;
   // Executions
   try {
     await accountUserService.updateUserInfo(
@@ -134,7 +134,8 @@ exports.updateMeAccountUser = async (req, res, next) => {
       firstName,
       phone,
       gender,
-      birthday
+      birthday,
+      address
     );
     return res.status(200).send();
   } catch (error) {
