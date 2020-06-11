@@ -20,8 +20,10 @@ const makerRoutes = require("./maker.routes");
 const brandRoutes = require("./brand.routes");
 const inventoryRoutes = require("./inventory.routes");
 const shopRoutes = require("./shop.routes");
-const orderRoutes = require("./order.routes");
 const promotionRoutes = require("./promotion.routes");
+const reportRoutes = require("./report.routes");
+
+const orderRoutes = require("./order.routes");
 const supportRoutes = require("./support.routes");
 
 const userFavItemRoutes = require("./userFavItem.routes");
@@ -48,8 +50,10 @@ router.use("/makers", makerRoutes);
 router.use("/brands", brandRoutes);
 router.use("/inventories", inventoryRoutes);
 router.use("/shop", shopRoutes);
-router.use("/orders", orderRoutes);
 router.use("/promotions", promotionRoutes);
+router.use("/reports", reportRoutes);
+
+router.use("/orders", orderRoutes);
 router.use("/support", supportRoutes);
 
 router.use("/favorite", userFavItemRoutes);
