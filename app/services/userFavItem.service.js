@@ -2,7 +2,7 @@ const db = require("../models");
 
 const { userFavItem: UserFavItem, item: Item, itemImg: ItemImg, media: Media } = db;
 
-const { getItemPreparation, getItemFinalization } = require("./item.service");
+const itemService = require("./item.service");
 const HttpError = require("../models/classes/http-error");
 const { ERRORS } = require("../utils/const.utils");
 
@@ -25,7 +25,9 @@ exports.getUserFavItems = async userId => {
       }
     ],
     where: { userId },
-    order: [["createdAt", "DESC"]]
+    order: [["createdAt", "DESC"]],
+    distinct: true,
+    subQuery: false
   });
   return { userFavItems, count };
 };
@@ -33,14 +35,14 @@ exports.getUserFavItems = async userId => {
 // POST: Add UserFavItem
 exports.addUserFavItem = async (userId, itemId) => {
   // Validations
-  const [includes] = await getItemPreparation(null, {
+  const [includes] = await itemService.getItemPreparation(null, {
     whitelist: ["PromotionItems", "Variations"]
   });
   const fetchedItem = await Item.findOne({ include: includes, where: { id: itemId } });
   if (!fetchedItem) {
     throw new HttpError(...ERRORS.INVALID.ITEM);
   }
-  const finalizedItem = getItemFinalization(fetchedItem);
+  const finalizedItem = itemService.getItemFinalization(fetchedItem);
   const existingUserFavItem = await UserFavItem.findOne({ where: { userId, itemId } });
   if (existingUserFavItem) {
     return false; // FavItem already has this item => no adding needed
