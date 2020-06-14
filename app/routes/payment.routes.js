@@ -58,6 +58,20 @@ router.post(
   paymentController.startPayment
 );
 
+// DELETE: Terminate Order (Invalid Card Number, ...)
+router.delete(
+  "/terminate",
+  isAuth,
+  hasRole(["user"]),
+  [
+    check("paymentIntentId")
+      .not()
+      .isEmpty()
+      .withMessage("Required.")
+  ],
+  paymentController.terminateOrder
+);
+
 // GET: Get payment's constant values (LoanTerms, APR)
 router.get("/consts", paymentController.getPaymentConsts);
 

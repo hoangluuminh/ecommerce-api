@@ -10,6 +10,134 @@ exports.SECRETKEY = {
 
 exports.ERRORS = {
   INVALID: {
+    AUTH_TOKEN: ["InvalidTokenError", "Refresh token không hợp lệ", 403],
+    MEDIA_TYPE: ["InvalidFileTypeError", "Sai kiểu dữ liệu tập tin", 400],
+    MEDIA_URL: ["InvalidMediaUrlError", "Không thể tìm thấy tập tin với tên xác định", 404],
+    //
+    ITEM: ["InvalidItemError", "Không thể tìm thấy Sản phẩm", 400],
+    ATTRIBUTE: ["InvalidAttributeError", "Không thể tìm thấy Thuộc tính", 400],
+    SCALE: ["InvalidScaleError", "Không thể tìm thấy Tỉ lệ", 400],
+    TYPE: ["InvalidTypeError", "Không thể tìm thấy Phân loại", 400],
+    MAKER: ["InvalidMakerError", "Không thể tìm thấy Nhà sản xuất", 400],
+    BRAND: ["InvalidBrandError", "Không thể tìm thấy Thương hiệu", 400],
+    INVENTORY: ["InvalidInventoryError", "Không thể tìm thấy món hàng trong kho", 400],
+    ITEMVARIATION: ["InvalidItemVariationError", "Không thể tìm thấy Màu Sản phẩm", 400],
+    SHOP: ["InvalidShopError", "Không thể tìm thấy cửa hàng", 400],
+    ORDER: ["InvalidOrderError", "Không thể tìm thấy Đơn hàng", 400],
+    ORDERSTATUS: ["InvalidOrderStatusError", "Không thể tìm thấy Trạng thái của Đơn hàng", 400],
+    PROMOTION: ["InvalidPromotionError", "Không thể tìm thấy Sự kiện khuyến mãi", 400],
+    SUPPORTTICKET: ["InvalidSupportTicketError", "Không thể tìm thấy Phiếu hỗ trợ", 400],
+    SUPPORTTYPE: ["InvalidSupportTypeError", "Không thể tìm thấy loại hỗ trợ", 400],
+    SUPPORTTICKETSTATUS: [
+      "InvalidSupportTicketStatusError",
+      "Không thể tìm thấy Trạng thái của Phiếu hỗ trợ",
+      400
+    ],
+    ITEMCOMMENT: ["InvalidItemCommentError", "Không thể tìm thấy Bài đánh giá", 400],
+    //
+    ACCOUNTUSER: ["InvalidAccountUserError", "Không thể tìm thấy Khách hàng", 400],
+    ACCOUNTSTAFF: ["InvalidAccountStaffError", "Không thể tìm thấy Nhân viên", 400],
+    OLDPASSWORD: ["InvalidOldPasswordError", "Sai mật khẩu cho tài khoản hiện tại", 400],
+    STAFF_ROLE: ["InvalidRoleError", "Không thể tìm thấy Vai trò", 400]
+  },
+  DUPLICATE: {
+    INVENTORY: ["DuplicateInventoryError", "Phát hiện sự trùng lặp trong Mã món hàng", 400]
+  },
+  UNIQUE: {
+    USER_USERNAME: ["UniqueUserUsernameError", "Tên tài khoản đã tồn tại", 400],
+    USER_EMAIL: ["UniqueUserEmailError", "Email đã tồn tại", 400],
+    ITEM: ["UniqueItemError", "Sản phẩm đã tồn tại", 400],
+    SCALE: ["UniqueScaleError", "Tỉ lệ đã tồn tại", 400],
+    TYPE: ["UniqueTypeError", "Phân loại đã tồn tại", 400],
+    MAKER: ["UniqueMakerError", "Nhà sản xuất đã tồn tại", 400],
+    BRAND: ["UniqueBrandError", "Thương hiệu đã tồn tại", 400],
+    ATTRIBUTE: ["DuplicateAttributeError", "Thuộc tính đã tồn tại", 400],
+    INVENTORY: ["UniqueInventoryError", "Một trong những Mã món hàng đã tồn tại", 400],
+    PROMOTION: ["DuplicatePromotionError", "Sự kiện khuyến mãi đã tồn tại", 400],
+    SUPPORTTICKET: ["DuplicateSupportTicketError", "Phiếu hỗ trợ đã tồn tại", 400]
+  },
+  AUTH: {
+    UNAUTHENTICATED: ["AuthUnauthenticatedError", "Chưa đăng nhập", 401],
+    UNAUTHORIZED: ["AuthUnauthorizedError", "Không đủ quyền truy cập", 403],
+    SESSIONEXPIRED: ["AuthTokenExpiredError", "Hết hạn phiên làm việc", 403],
+    ISLOCKED: ["AuthIsLockedError", "Tài khoản đã bị khoá", 403],
+    LOGIN_USERNAME: ["AuthUsernameError", "Sai tài khoản / email hoặc mật khẩu", 400],
+    LOGIN_PASSWORD: ["AuthPasswordError", "Sai tài khoản / email hoặc mật khẩu", 400]
+  },
+  MISC: {
+    ROUTE: ["RouteError", "Không thể đi đến đường dẫn này", 404],
+    MEDIA_FILESIZE: ["ExceedingFileSizeError", "Vượt kích thước cho phép", 400],
+    ITEM_VARIATIONMISSING: [
+      "ItemVariationMissingError",
+      "Danh sách màu đã cung cấp còn thiếu màu",
+      400
+    ],
+    INVENTORY_BOUGHT: ["InventoryBoughtError", "Món hàng đã mua không thể được cập nhật", 400],
+    INVENTORY_INCORRECTITEM: [
+      "InventoryIncorrectItemError",
+      "Màu của món hàng phải thuộc về sản phẩm của nó",
+      400
+    ],
+    INVENTORY_INCORRECTVARIATION: [
+      "InventoryIncorrectVariationError",
+      "Món hàng xác định phải thuộc về màu của nó",
+      400
+    ],
+    INVENTORY_UNAVAILABLE: ["InventoryUnavailableError", "Món hàng này không tồn tại", 400],
+    ATTRIBUTE_DYNAMIC: [
+      "AttributeDynamicValueError",
+      "Giá trị cho Thuộc tính Tĩnh phải là số",
+      400
+    ],
+    ORDER_CARTVARIATION: [
+      "OrderIncorrectVariationError",
+      "Một trong những màu đã xác định không thuộc về sản phẩm của nó",
+      400
+    ],
+    ORDER_QUANTITY: ["OrderQuantityError", "Số lượng tồn hàng không đủ đáp ứng yêu cầu", 400],
+    ORDER_FORBIDDEN: [
+      "OrderForbiddenError",
+      "Hành động này không thể được thực hiện trên đơn hàng này",
+      400
+    ],
+    ORDER_EXCEEDDOWNPAYMENT: [
+      "OrderExceedDownpaymentError",
+      "Downpayment must be below 85% of Total Payment.",
+      400
+    ],
+    ORDERDETAIL_MISMATCH: [
+      "OrderDetailMismatchError",
+      "Phát hiện sai khớp về Màu giữa CT ĐHàng đã cung cấp và CTĐH trên CSDL",
+      400
+    ],
+    ITEMCOMMENT_UNOWNED: [
+      "ItemCommentUnownedError",
+      "Bạn phải mua sản phẩm mới có thể đánh giá sản phẩm",
+      400
+    ]
+  },
+  UNKNOWN: {
+    GET: ["UnknownGetError", "Retrieving unsuccessful. Please try again later", 500],
+    ADD: ["UnknownAddError", "Adding unsuccessful. Please try again later", 500],
+    UPDATE: ["UnknownUpdateError", "Updating unsuccessful. Please try again later", 500],
+    SWAP: ["UnknownSwapImgsError", "Swapping unsuccessful. Please try again later", 500],
+    DELETE: ["UnknownDeleteError", "Deleting unsuccessful. Please try again later", 500],
+    UPLOAD: ["UnknownUploadError", "Uploading unsuccessful. Please try again later", 500],
+    AUTH: {
+      LOGIN: ["UnknownLoginError", "Login unsuccessful", 500],
+      LOGOUT: ["UnknownLogoutError", "Logout failed", 403],
+      LOGOUTSESSIONS: ["UnknownLogoutSessionsError", "Logout all sessions failed", 403]
+    },
+    PAYMENT: [
+      "UnknownPaymentError",
+      "Payment transaction error occurred. Please try again later",
+      500
+    ]
+  }
+};
+
+exports.ERRORS_EN = {
+  INVALID: {
     AUTH_TOKEN: ["InvalidTokenError", "Invalid refresh token", 403],
     MEDIA_TYPE: ["InvalidFileTypeError", "Invalid file type", 400],
     MEDIA_URL: ["InvalidMediaUrlError", "File with specified name cannot be found", 404],

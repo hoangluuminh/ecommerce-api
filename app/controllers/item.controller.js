@@ -58,7 +58,8 @@ exports.getItems = async (req, res, next) => {
       price,
       variationName,
       attributes,
-      withHidden
+      withHidden,
+      req.jwtDecoded ? req.jwtDecoded.data.accountUserId || null : null
     );
     return res.json({
       items,

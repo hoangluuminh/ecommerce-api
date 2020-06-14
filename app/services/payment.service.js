@@ -35,10 +35,16 @@ exports.startPayment = async (userId, billingDetails, loan, cart) => {
     });
     // Change orderId with paymentIntentId from Stripe
     await Order.update({ paymentIntentId: paymentIntent.id }, { where: { id: orderId } });
-    return paymentIntent.client_secret;
+    return { clientSecret: paymentIntent.client_secret, paymentIntentId: paymentIntent.id };
   } catch (e) {
     throw new HttpError(...ERRORS.UNKNOWN.PAYMENT);
   }
+};
+
+// DELETE: Terminate Order (Invalid Card Number, ...)
+exports.terminateOrder = async (userId, paymentIntentId) => {
+  await Order.destroy({ where: { paymentIntentId, userId, statusId: "processing" } });
+  return true;
 };
 
 exports.chargedPayment = async paymentIntentId => {
