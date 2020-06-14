@@ -22,13 +22,13 @@ exports.startPayment = async (req, res, next) => {
   const { billingDetails, loan, cart } = req.body;
   // Executions
   try {
-    const clientSecret = await paymentService.startPayment(
+    const { clientSecret, paymentIntentId } = await paymentService.startPayment(
       accountUserId,
       billingDetails,
       loan,
       cart
     );
-    return res.json({ client_secret: clientSecret });
+    return res.json({ client_secret: clientSecret, paymentIntentId });
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
     if (
@@ -51,6 +51,28 @@ exports.startPayment = async (req, res, next) => {
       return next(error);
     }
     return next(new HttpError(...ERRORS.UNKNOWN.PAYMENT));
+  }
+};
+
+// DELETE: Terminate Order (Invalid Card Number, ...)
+exports.terminateOrder = async (req, res, next) => {
+  const actionName = "startPayment";
+  // Validations
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    getUserReqMsg(`${controllerName}.${actionName}`, errors);
+    return res.status(422).json(errors);
+  }
+  // Declarations
+  const { accountUserId: userId } = req.jwtDecoded.data;
+  const { paymentIntentId } = req.body;
+  // Executions
+  try {
+    await paymentService.terminateOrder(userId, paymentIntentId);
+    return res.status(200).send();
+  } catch (error) {
+    getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
+    return next(new HttpError(...ERRORS.UNKNOWN.DELETE));
   }
 };
 

@@ -2,12 +2,12 @@ const _ = require("lodash");
 
 const db = require("../models");
 
-const { Op } = db.Sequelize;
+const { Op, fn, col } = db.Sequelize;
 const { inventory: Inventory, item: Item, itemVariation: ItemVariation } = db;
 
 const HttpError = require("../models/classes/http-error");
 const { ERRORS } = require("../utils/const.utils");
-const generateId = require("../utils/id.utils");
+// const generateId = require("../utils/id.utils");
 
 // GET: List of inventories
 exports.getInventories = async (query, page, size, sort, sortDesc, itemId) => {
@@ -95,8 +95,26 @@ exports.getInventory = async inventoryId => {
 
 // POST: Add Inventories
 exports.addInventories = async inventories => {
-  // inventories include array of { itemId, variationName, quantity }
+  // inventories include array of { inventoryItemId, itemId, variationName }
   /* VALIDATIONS */
+  // Validate inventoryItemIds, by getting list of inventoryItemIds as "identifiers"
+  const identifiers = inventories.map(inv => inv.inventoryItemId);
+  if (identifiers.filter((v, i, self) => self.indexOf(v) === i).length !== identifiers.length) {
+    // Check duplication
+    throw new HttpError(...ERRORS.DUPLICATE.INVENTORY);
+  }
+  const { "count(*)": existingInventoriesCount } = await Inventory.findOne({
+    attributes: [fn("count", col("*"))],
+    raw: true,
+    where: {
+      id: {
+        [Op.or]: identifiers
+      }
+    }
+  });
+  if (existingInventoriesCount > 0) {
+    throw new HttpError(...ERRORS.UNIQUE.INVENTORY);
+  }
   // Get list of distinct itemId, check if they're all valid
   const uniqItemIds = _.uniq(inventories.map(inv => inv.itemId));
   const checkingItems = await Item.findAll({
@@ -122,25 +140,29 @@ exports.addInventories = async inventories => {
       }))
     }
   });
-  if (inventories.length !== correspondingItemVariations.length) {
+  if (
+    _.uniqWith(
+      inventories.map(inv => ({ itemId: inv.itemId, variationName: inv.variationName })),
+      _.isEqual
+    ).length !== correspondingItemVariations.length
+  ) {
     throw new HttpError(...ERRORS.MISC.INVENTORY_INCORRECTITEM);
   }
   /* EXECUTIONS */
   const inventoriesFinalized = inventories.reduce((arr, inv) => {
     const newArr = [...arr];
-    for (let i = 0; i < inv.quantity; i += 1) {
-      newArr.push({
-        itemId: inv.itemId,
-        variationId: correspondingItemVariations.find(
-          varia => varia.itemId === inv.itemId && varia.name === inv.variationName
-        ).id
-      });
-    }
+    newArr.push({
+      inventoryItemId: inv.inventoryItemId,
+      itemId: inv.itemId,
+      variationId: correspondingItemVariations.find(
+        varia => varia.itemId === inv.itemId && varia.name === inv.variationName
+      ).id
+    });
     return newArr;
   }, []);
   await Inventory.bulkCreate(
     inventoriesFinalized.map(inv => ({
-      id: generateId(),
+      id: inv.inventoryItemId,
       itemId: inv.itemId,
       variationId: inv.variationId,
       available: true,

@@ -67,6 +67,7 @@ const itemInfoChecks = [
 // GET: List of products
 router.get(
   "/",
+  getJwtDecoded,
   [
     // query("query").optional(),
     query("page")

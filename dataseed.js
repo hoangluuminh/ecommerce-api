@@ -335,7 +335,23 @@ async function dataSeed() {
       await Promise.all([
         db.supportType.create(
           {
-            id: "1_technical",
+            id: "1_question",
+            name: "Thắc mắc",
+            description: "Thắc mắc về cửa hàng, sản phẩm, dịch vụ, cách thức nhận hàng"
+          },
+          { transaction: t }
+        ),
+        db.supportType.create(
+          {
+            id: "2_order",
+            name: "Truy vấn về đơn hàng",
+            description: "Nhận thông tin chi tiết về trạng thái của đơn hàng, sản phẩm đã đặt"
+          },
+          { transaction: t }
+        ),
+        db.supportType.create(
+          {
+            id: "3_technical",
             name: "Vấn đề kĩ thuật",
             description: "Nhận trợ giúp, hoặc báo cáo lỗi bạn mắc phải khi xem sản phẩm, thanh toán"
           },
@@ -343,10 +359,9 @@ async function dataSeed() {
         ),
         db.supportType.create(
           {
-            id: "2_aftersales",
-            name: "Truy vấn sau mua hàng",
-            description:
-              "Nhận trợ giúp hoặc khiếu nại về sản phẩm, đơn hàng đã mua (Sản phẩm lỗi, Trả hàng, v.v.)"
+            id: "4_other",
+            name: "Khác",
+            description: "Truy vấn hoặc nhận trợ giúp về các vấn đề khác"
           },
           { transaction: t }
         )
@@ -398,8 +413,8 @@ async function dataSeed() {
       );
 
       // paymentMethod
-      await db.paymentMethod.create({ id: "cash", name: "Cash" }, { transaction: t });
-      await db.paymentMethod.create({ id: "cc", name: "Credit Card" }, { transaction: t });
+      await db.paymentMethod.create({ id: "cash", name: "Tiền mặt" }, { transaction: t });
+      await db.paymentMethod.create({ id: "cc", name: "Thẻ tín dụng" }, { transaction: t });
 
       // orderStatus
       await db.orderStatus.create({ id: "processing", name: "Chờ thanh toán" }, { transaction: t });
@@ -638,7 +653,7 @@ async function dataSeed() {
         ),
         newItem(
           {
-            id: " porsche-918-spyder-112-gtspirit ",
+            id: "porsche-918-spyder-112-gtspirit ",
             name: "Porsche 918 Spyder 1:12 Gtspirit",
             scale: "1_12",
             type: "car",
@@ -663,11 +678,11 @@ async function dataSeed() {
       const promotion1 = await db.promotion.create(
         {
           id: generateId(),
-          name: "Khuyến mãi vĩnh cữu",
+          name: "Khuyến mãi vĩnh cửu",
           timeStart: new Date(),
           timeEnd: new Date("2030"),
           description: "Giảm 10% với các sản phẩm nhất định",
-          offPercent: 5
+          offPercent: 10
         },
         { transaction: t }
       );

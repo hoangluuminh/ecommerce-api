@@ -1,4 +1,4 @@
-const fs = require("fs");
+const mv = require("mv");
 const util = require("util");
 const db = require("../models");
 
@@ -31,7 +31,7 @@ exports.uploadImages = async files => {
     const fileName = `${generateId()}_${files[i].name.slice(-25)}`; // slice from end, get 25 chars
     const newpath = `.${mediaConfig.DIR}/${fileName}`;
 
-    const promise = util.promisify(fs.rename)(oldpath, newpath);
+    const promise = util.promisify(mv)(oldpath, newpath);
 
     renamingPromises.push(promise);
     fileNames.push(fileName);

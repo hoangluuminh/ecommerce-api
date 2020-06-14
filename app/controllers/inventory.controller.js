@@ -81,7 +81,14 @@ exports.addInventories = async (req, res, next) => {
     return res.status(200).send();
   } catch (error) {
     getDatabaseInteractMsg(`${controllerName}.${actionName}`, error);
-    if ([ERRORS.INVALID.ITEM[0], ERRORS.MISC.INVENTORY_INCORRECTITEM[0]].indexOf(error.name) >= 0) {
+    if (
+      [
+        ERRORS.DUPLICATE.INVENTORY[0],
+        ERRORS.UNIQUE.INVENTORY[0],
+        ERRORS.INVALID.ITEM[0],
+        ERRORS.MISC.INVENTORY_INCORRECTITEM[0]
+      ].indexOf(error.name) >= 0
+    ) {
       return next(error);
     }
     return next(new HttpError(...ERRORS.UNKNOWN.ADD));

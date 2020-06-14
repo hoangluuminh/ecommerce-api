@@ -48,7 +48,8 @@ exports.getItems = async (
   price,
   variationName,
   attributes,
-  withHidden
+  withHidden,
+  userId
 ) => {
   // Declarations
   const [includes] = await getItemPreparation(attributes); // eslint-disable-line
@@ -155,10 +156,15 @@ exports.getItems = async (
   let count = attributes || variationName ? [...seqItems].length : seqCount;
 
   /* POST PROCESSING (cuz either Sequelize or the dev is incompetent) */
-  let items = seqItems;
-  items = items.map(item => {
-    return getItemFinalization(item, attributes, variationName); // eslint-disable-line
-  });
+  let items = [];
+  for (let i = 0; i < seqItems.length; i += 1) {
+    const newItem = getItemFinalization(seqItems[i], attributes, variationName); // eslint-disable-line
+    if (newItem) {
+      // eslint-disable-next-line
+      newItem.dataValues.isFavorited = userId ? await isUserFavItem(userId, newItem.id) : false;
+    }
+    items.push(newItem);
+  }
   // Filtering empty item (due to attribute filters)
   items = items.filter(item => item !== null);
   // Pagination

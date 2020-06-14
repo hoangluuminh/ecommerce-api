@@ -52,36 +52,16 @@ router.post(
         }
         for (let i = 0; i < value.length; i += 1) {
           if (
-            !["itemId", "variationName", "quantity"].every(v => Object.keys(value[i]).includes(v))
+            !["inventoryItemId", "itemId", "variationName"].every(v =>
+              Object.keys(value[i]).includes(v)
+            )
           ) {
             return false;
           }
         }
         return true;
       })
-      .withMessage("All item must include itemId, variationName and quantity."),
-    check("inventories")
-      .custom(value => {
-        for (let i = 0; i < value.length; i += 1) {
-          if (!(isInt(value[i].quantity.toString()) && value[i].quantity >= 1)) {
-            return false;
-          }
-        }
-        return true;
-      })
-      .withMessage("Quantity must be a number and >= 1."),
-    check("inventories")
-      .custom(value => {
-        const uniqInvs = _.uniqWith(
-          value.map(inv => ({
-            itemId: inv.itemId,
-            variationName: inv.variationName
-          })),
-          _.isEqual
-        );
-        return uniqInvs.length === value.length;
-      })
-      .withMessage("Pair of itemId and variationName must be unique.")
+      .withMessage("All item must include inventoryItemId, itemId and variationName.")
   ],
   inventoryController.addInventories
 );
