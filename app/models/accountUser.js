@@ -1,22 +1,19 @@
 module.exports = (Sequelize, sequelize) => {
-  const Brand = sequelize.define(
-    "Brand",
+  const AccountUser = sequelize.define(
+    "Account_User",
     {
       id: {
         type: Sequelize.STRING(50),
         primaryKey: true,
         allowNull: false
       },
-      name: {
-        type: Sequelize.STRING(100),
+      accountId: {
+        type: Sequelize.STRING(50),
         allowNull: false
       },
-      description: {
-        type: Sequelize.TEXT,
-        allowNull: true
-      },
-      placing: {
-        type: Sequelize.INTEGER,
+      locked: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
         allowNull: false
       }
     },
@@ -25,5 +22,6 @@ module.exports = (Sequelize, sequelize) => {
       updatedAt: false
     }
   );
-  return Brand;
+
+  return AccountUser;
 };

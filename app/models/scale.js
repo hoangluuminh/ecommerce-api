@@ -1,6 +1,6 @@
 module.exports = (Sequelize, sequelize) => {
-  const Brand = sequelize.define(
-    "Brand",
+  const Scale = sequelize.define(
+    "Scale",
     {
       id: {
         type: Sequelize.STRING(50),
@@ -25,5 +25,5 @@ module.exports = (Sequelize, sequelize) => {
       updatedAt: false
     }
   );
-  return Brand;
+  return Scale;
 };
